@@ -3,6 +3,12 @@
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+# Recommended: add any editor/OS/tool-specific ignore rules from the Global/ templates as needed.
+# See: https://github.com/github/gitignore/tree/main/Global
+#
+>>>>>>> 61e23ddc54dbc44027cd806f9395735e8c25fe65
 =======
 # Recommended: add any editor/OS/tool-specific ignore rules from the Global/ templates as needed.
 # See: https://github.com/github/gitignore/tree/main/Global
@@ -50,6 +56,10 @@ ExportedObj/
 *.unityproj
 *.sln
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+*.slnx
+>>>>>>> 61e23ddc54dbc44027cd806f9395735e8c25fe65
 =======
 *.slnx
 >>>>>>> 61e23ddc54dbc44027cd806f9395735e8c25fe65
@@ -108,7 +118,10 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 61e23ddc54dbc44027cd806f9395735e8c25fe65
 
 # Auto-generated cache in Assets folder
 <<<<<<< HEAD
@@ -116,4 +129,7 @@ InitTestScene*.unity*
 =======
 /[Aa]ssets/[Ss]ceneDependencyCache*
 >>>>>>> 0ce239c07f516ca54c0a4b86ff175e53a8e68881
+<<<<<<< HEAD
+>>>>>>> 61e23ddc54dbc44027cd806f9395735e8c25fe65
+=======
 >>>>>>> 61e23ddc54dbc44027cd806f9395735e8c25fe65
