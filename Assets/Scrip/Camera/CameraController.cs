@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
@@ -7,8 +8,10 @@ public class CameraController : MonoBehaviour
 
     private float ValorX;
     private float ValorY;
-    private float RotacionX;
+    private float RotacionX; 
     private float RotacionY;
+    private float Bodyrotation;
+    private float Body;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -24,9 +27,13 @@ public class CameraController : MonoBehaviour
         RotacionX += ValorX;
         RotacionY -= ValorY;
 
-        transform.localRotation = Quaternion.Euler(RotacionY, 0, 0);
-
-        PlayerBody.Rotate(Vector3.up * ValorX);
+        transform.localRotation = Quaternion.Euler(RotacionY, RotacionX, 0);
+        if (Bodyrotation < ValorX || Bodyrotation < ValorY)
+        {
+            Body = Bodyrotation + 1;
+        }
+        PlayerBody.Rotate(Vector3.up * Body);
         RotacionY = Mathf.Clamp(RotacionY, -90, 90);
+        RotacionX = Mathf.Clamp(RotacionX, -90, 90);
     }
 }
