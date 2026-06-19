@@ -22,19 +22,19 @@ public class DealerController : MonoBehaviour
 
     [HideInInspector] public int cartasJugadorCount = 0;
 
-    private bool juegoInicia = false;
+    private bool gamestarted = false;
 
     // Update is called once per frame
     void Update()
     {
-        if (start.EmpezarJuego && !juegoInicia)
+        if (start.EmpezarJuego && !gamestarted)
         {
-            juegoIniciado();
-            juegoInicia = true;
+            StartGame();
+            gamestarted = true;
         }
     }
 
-    void juegoIniciado()
+    void StartGame()
     {
         Debug.Log("Dealer inicia la ronda");
         

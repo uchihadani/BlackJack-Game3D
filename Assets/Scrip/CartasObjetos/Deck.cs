@@ -4,27 +4,27 @@ using System.Collections.Generic;
 public class Deck : MonoBehaviour
 {
     [SerializeField] private List<int> mazo = new List<int>();
+    [SerializeField] private List<int> maldiciones = new List<int>();
    
     public void GenerarMazo()
     {
         mazo.Clear();
-        for (int i = 1; i <= 13; i++)
+        for (int valor = 0; valor <= 11; valor++)
         {
-            for (int j = 0; j < 4; j++)
+            if (valor <= 4)
             {
-                int valorCarta = i;
-                if(valorCarta > 10)
-                {
-                    valorCarta = 10;
-                }
-                mazo.Add(valorCarta);
+                mazo.Add(valor); mazo.Add(valor); mazo.Add(valor); mazo.Add(valor);  
+            }
+            else
+            {
+                mazo.Add(valor);
             }
         }
     }
 
     public void MezclarMazo()
     {
-        for(int i=0; i < mazo.Count; i++)
+        for(int i = 0; i < mazo.Count; i++)
         {
             int r = Random.Range(0, mazo.Count);
 
@@ -46,6 +46,5 @@ public class Deck : MonoBehaviour
 
         return valor;
     }
-
-
 }
+
