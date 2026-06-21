@@ -5,6 +5,7 @@ public class startButton : MonoBehaviour
     [SerializeField] private Selector player;
     [SerializeField] private Canvas startCanvas;
     [SerializeField] private Canvas UIopciones;
+    [SerializeField] ManoController ManoController;
 
     [HideInInspector] public bool EmpezarJuego = false;
 
@@ -24,8 +25,8 @@ public class startButton : MonoBehaviour
     //CONFIGURACION DE BOTONES PEDIR-DUPLICAR-QUEDARSE
     public void PedirCartaJugador()
     {
-        dealer.DarCarta(dealer.PuntoJugador, true);
-        dealer.VerificarLimiteJ();
+        ManoController.DarCarta(dealer.PuntoJugador, true);
+        ManoController.VerificarLimite();
     }
 
     public void Quedarse()

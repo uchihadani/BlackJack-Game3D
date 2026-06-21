@@ -3,48 +3,70 @@ using System.Collections.Generic;
 
 public class Deck : MonoBehaviour
 {
-    [SerializeField] private List<int> mazo = new List<int>();
-    [SerializeField] private List<int> maldiciones = new List<int>();
-   
+    [Header("Base de Datos (Pon aquí todas tus cartas creadas)")]
+    // Aquí arrastras desde el editor todas las cartas que crees (malditas y normales)
+    [SerializeField] private List<CartaData> todasLasCartasDisponibles = new List<CartaData>();
+
+    [Header("Mazo en Juego (Se llena automáticamente)")]
+    // Esta lista será tu mazo real balanceado con las probabilidades
+    [SerializeField] private List<CartaData> mazoDeCartas = new List<CartaData>();
+    
+    private int indiceActual = 0;
+
     public void GenerarMazo()
     {
-        mazo.Clear();
-        for (int valor = 0; valor <= 11; valor++)
+        mazoDeCartas.Clear();
+        indiceActual = 0;
+
+        // CORRECCIÓN: Cambiar 'en' por 'in'
+        foreach (CartaData carta in todasLasCartasDisponibles)
         {
-            if (valor <= 4)
+            if (carta.valor <= 4)
             {
-                mazo.Add(valor); mazo.Add(valor); mazo.Add(valor); mazo.Add(valor);  
+                mazoDeCartas.Add(carta);
+                mazoDeCartas.Add(carta);
+                mazoDeCartas.Add(carta);
+                mazoDeCartas.Add(carta);
             }
             else
             {
-                mazo.Add(valor);
+                mazoDeCartas.Add(carta);
             }
         }
+
+        Debug.Log("Mazo generado con " + mazoDeCartas.Count + " cartas.");
     }
 
     public void MezclarMazo()
     {
-        for(int i = 0; i < mazo.Count; i++)
+        // Tu algoritmo de intercambio (Fisher-Yates) adaptado a objetos CartaData
+        for (int i = 0; i < mazoDeCartas.Count; i++)
         {
-            int r = Random.Range(0, mazo.Count);
+            int r = Random.Range(0, mazoDeCartas.Count);
 
-            int temp = mazo[i];
-            mazo[i] = mazo[r];
-            mazo[r] = temp;
+            CartaData temp = mazoDeCartas[i];
+            mazoDeCartas[i] = mazoDeCartas[r];
+            mazoDeCartas[r] = temp;
         }
+        
+        Debug.Log("Mazo mezclado exitosamente.");
     }
 
-    public int SacarCarta()
+    // Ahora retorna correctamente el ScriptableObject 'CartaData'
+    public CartaData SacarCarta()
     {
-        if(mazo.Count == 0)
+        if (mazoDeCartas.Count == 0)
         {
-            GenerarMazo();
-            MezclarMazo();
+            Debug.LogError("¡El mazo está vacío! Asegúrate de llamar a GenerarMazo antes.");
+            return null;
         }
-        int valor = mazo[0];
-        mazo.RemoveAt(0);
 
-        return valor;
+        // Sacamos la carta actual
+        CartaData cartaRobada = mazoDeCartas[indiceActual];
+        
+        // Avanzamos el índice de forma circular
+        indiceActual = (indiceActual + 1) % mazoDeCartas.Count; 
+
+        return cartaRobada;
     }
 }
-
