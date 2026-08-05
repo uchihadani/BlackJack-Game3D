@@ -1,0 +1,25 @@
+{
+  "name": "TwentyThree.Editor",
+  "rootNamespace": "TwentyThree.Editor",
+  "references": [
+    "TwentyThree.Domain",
+    "TwentyThree.Application",
+    "TwentyThree.Infrastructure",
+    "TwentyThree.Presentation",
+    "TwentyThree.Bootstrap",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

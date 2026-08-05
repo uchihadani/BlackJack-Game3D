@@ -1,0 +1,17 @@
+{
+  "name": "TwentyThree.Infrastructure",
+  "rootNamespace": "TwentyThree.Infrastructure",
+  "references": [
+    "TwentyThree.Domain",
+    "TwentyThree.Application"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

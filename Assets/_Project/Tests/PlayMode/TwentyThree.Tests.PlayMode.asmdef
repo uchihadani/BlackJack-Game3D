@@ -1,0 +1,28 @@
+{
+  "name": "TwentyThree.Tests.PlayMode",
+  "rootNamespace": "TwentyThree.Tests.PlayMode",
+  "references": [
+    "TwentyThree.Domain",
+    "TwentyThree.Application",
+    "TwentyThree.Infrastructure",
+    "TwentyThree.Presentation",
+    "TwentyThree.Bootstrap",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

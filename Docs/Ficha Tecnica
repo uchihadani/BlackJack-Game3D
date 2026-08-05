@@ -1,4 +1,22 @@
 Especificación de reglas para el prototipo
+Versión: 1.0
+Fecha de revisión: 5 de agosto de 2026
+Estado: base técnica aprobada; Gate A de contenido abierto
+
+Autoridad documental
+Para programación, esta ficha técnica prevalece sobre el GDD cuando exista una diferencia de precisión o alcance.
+El GDD define la visión, la experiencia y las posibilidades futuras; esta ficha define el contrato implementable de la demo.
+
+Pendientes que no bloquean las Fases 1 y 2
+Diseño de contenido debe aprobar, antes de comenzar la Fase 3:
+cinco objetos de la demo;
+cinco cartas especiales de la demo;
+tres eventos independientes de la demo;
+la especificación definitiva de Presión y sus interacciones.
+Responsable funcional: Diseño de contenido; asignación nominal pendiente por parte del equipo.
+Fecha límite de desarrollo: Gate A, antes de iniciar la Fase 3.
+Todo valor o ejemplo dentro de esos bloques se considera propuesta no vinculante hasta su aprobación explícita.
+
 Los siguientes valores representan la configuración inicial de la versión demo. Deberán poder modificarse desde Unity mediante archivos de configuración o ScriptableObjects, ya que el balance definitivo dependerá de las pruebas con jugadores.
 
 1. Terminología de la partida
@@ -481,7 +499,9 @@ lucidez;
 relación con el Dealer;
 cantidad de derrotas consecutivas;
 efectos activos.
-Debemos aclarar si la presión se acumula o no. Ejemplo:
+Regla normativa para pedir después de una derrota:
+El valor de +15 reemplaza al +10 base; representa el total de Presión de cada carta pedida bajo esa condición y no se suma como +10 +15.
+Ejemplo:
 Sin derrota previa:
 Pedir una carta → +10.
 

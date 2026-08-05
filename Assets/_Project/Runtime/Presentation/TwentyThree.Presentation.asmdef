@@ -1,0 +1,20 @@
+{
+  "name": "TwentyThree.Presentation",
+  "rootNamespace": "TwentyThree.Presentation",
+  "references": [
+    "TwentyThree.Domain",
+    "TwentyThree.Application",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

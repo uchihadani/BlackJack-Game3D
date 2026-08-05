@@ -1,0 +1,31 @@
+{
+  "name": "TwentyThree.Tests.EditMode",
+  "rootNamespace": "TwentyThree.Tests.EditMode",
+  "references": [
+    "TwentyThree.Domain",
+    "TwentyThree.Application",
+    "TwentyThree.Infrastructure",
+    "TwentyThree.Presentation",
+    "TwentyThree.Bootstrap",
+    "TwentyThree.Editor",
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [
+    "UNITY_INCLUDE_TESTS"
+  ],
+  "versionDefines": [],
+  "noEngineReferences": false,
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

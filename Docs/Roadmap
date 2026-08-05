@@ -1,4 +1,8 @@
 Roadmap
+Versión: 1.1
+Fecha de revisión: 5 de agosto de 2026
+Autoridad: la Ficha Técnica manda para programación; el GDD define la visión.
+
 Fase 1 — Arreglar la base del proyecto
 No se programan todavía cartas ni apuestas.
 Paso 1: crear la estructura de código
@@ -44,7 +48,7 @@ GameRoom
 Contiene:
 Habitación.
 Jugador.
-Dealer.
+Punto reservado para el Dealer, que se incorpora con el reglamento y la mesa en fases posteriores.
 Mesa.
 Interactuables.
 El escenario visual existente se integra aquí cuando corresponda.
@@ -231,6 +235,7 @@ Gate A — El punto en que debemos detenernos
 Aquí debe entregar su trabajo la persona que diseña:
 Cinco cartas especiales.
 Cinco objetos.
+Tres eventos independientes.
 Presión.
 No basta con entregar nombres. Cada contenido debe indicar exactamente qué hace.
 Ejemplo de una definición incompleta
