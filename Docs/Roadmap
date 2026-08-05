@@ -1,0 +1,400 @@
+Roadmap
+Fase 1 — Arreglar la base del proyecto
+No se programan todavía cartas ni apuestas.
+Paso 1: crear la estructura de código
+En vez de seguir colocando scripts dentro de Assets/Script, se crea:
+Assets/_Project/
+├── Runtime/
+├── Content/
+├── Scenes/
+├── Prefabs/
+└── Tests/
+Dentro de Runtime:
+Domain          Reglas
+Application     Coordinación
+Infrastructure  Guardado, RNG y configuración
+Presentation    Cámara, UI, cartas visuales
+Bootstrap       Inicio y conexión de sistemas
+Paso 2: crear límites entre módulos
+Los asmdef son archivos de Unity que indican qué grupo de código puede usar a cuál.
+Ejemplo:
+Presentation puede consultar Application.
+Application puede consultar Domain.
+Domain no puede consultar Presentation.
+Si alguien intenta usar un botón dentro de una regla de dinero, Unity lo detecta como una dependencia incorrecta.
+Paso 3: crear las escenas definitivas
+Bootstrap
+MainMenu
+GameRoom
+Bootstrap
+Es la primera escena.
+Se encarga de:
+Cargar configuración.
+Preparar servicios.
+Abrir el menú.
+Detectar errores iniciales.
+No contiene gameplay.
+MainMenu
+Contiene:
+Nueva partida.
+Continuar.
+Opciones.
+Salir.
+GameRoom
+Contiene:
+Habitación.
+Jugador.
+Dealer.
+Mesa.
+Interactuables.
+El escenario visual existente se integra aquí cuando corresponda.
+Paso 4: reemplazar cámara e input
+No se modifica solamente la línea que genera el bug. Se construye el controlador final:
+Mouse mueve la vista.
+El cuerpo rota horizontalmente.
+La cámara rota verticalmente.
+Se puede configurar sensibilidad.
+Se puede invertir Y.
+Al sentarse se deshabilita el movimiento.
+Al usar UI se libera el cursor y se detiene el look.
+Al levantarse se recupera exploración.
+Paso 5: interacción
+Se crea una interacción general:
+El jugador mira algo.
+El sistema detecta un interactuable.
+Muestra el mensaje correspondiente.
+El jugador presiona Interactuar.
+El objeto ejecuta su interacción.
+La silla será un interactuable, pero el mismo sistema servirá después para:
+Tienda.
+Almacenamiento.
+Radio.
+Televisor.
+Puerta.
+Documentos.
+Qué puede hacer el jugador al terminar esta fase
+Abrir el juego.
+Ver el menú.
+Entrar a la habitación.
+Caminar.
+Mirar sin que la cámara gire sola.
+Interactuar con la silla.
+Sentarse.
+Usar el cursor.
+Levantarse.
+Volver al menú.
+Todavía no se reparten cartas. Esto no es un gameplay temporal: es la base definitiva de navegación e interacción.
+Qué no hice todavía
+No prepare los controladores viejos de cartas.
+No cree cartas sin que estén definidas.
+No hice una UI temporal de Blackjack.
+No implemente objetos.
+No implemente Presión.
+
+Fase 2 — Programar el reglamento ya definido
+En esta fase se programa el juego internamente, pero todavía sin presentación completa.
+Paso 1: dinero
+Se crea un tipo Money.
+Ejemplos internos:
+50 monedas = 5.000 unidades
+10 monedas = 1.000 unidades
+9,20 monedas = 920 unidades
+Money controla:
+Sumar.
+Restar.
+Comparar.
+Impedir negativos.
+Aplicar porcentajes.
+Redondear.
+Ningún otro sistema calcula dinero por su cuenta.
+Paso 2: configuración económica
+Desde Unity se podrá editar:
+Dinero inicial
+Deuda inicial
+Apuesta mínima
+Máximo de cada ronda
+Interés
+Payouts
+Cantidad de manos
+Cantidad de rondas
+Deudas de cada ciclo
+Paso 3: cartas numéricas
+Una carta tendrá:
+ID
+Palo
+Rango
+Valor
+No será necesario crear un FBX diferente para cada carta. Una sola carta 3D recibirá su imagen correspondiente.
+El generador construirá:
+13 corazones
+13 diamantes
+13 tréboles
+13 picas
+Paso 4: cálculo de mano
+Un único evaluador calcula el total.
+Ejemplos:
+As + 8 + 4 = 23
+As + 10 + 8 = 19
+As + As + 10 = 22
+Ni el jugador ni el Dealer suman puntajes por separado. Ambos usan el mismo evaluador.
+Paso 5: mazo y barajado
+El mazo:
+Se crea al comenzar la ronda.
+Se baraja con una seed.
+Conserva cartas gastadas.
+No repite cartas.
+Mantiene descarte.
+Maneja agotamiento.
+Registra el orden para reproducción.
+Paso 6: Dealer
+El Dealer consulta su mano:
+Menos de 17 → pide.
+17 o más → se planta.
+Más de 23 → pierde.
+No conoce botones ni animaciones.
+Paso 7: apuesta
+Al confirmar:
+Saldo: 50
+Apuesta: 10
+
+Nuevo saldo: 40
+Apuesta bloqueada: 10
+Resoluciones:
+Derrota:
+Saldo final 40.
+
+Empate:
+Se devuelven 10.
+Saldo final 50.
+
+Victoria normal:
+Se devuelven 10 + 9,20.
+Saldo final 59,20.
+
+23 inicial:
+Se devuelven 10 + 12.
+Saldo final 62.
+Paso 8: ronda y ciclo
+El sistema cuenta:
+Mano actual: 1 de 5.
+Ronda actual: 1 de 4.
+Ciclo actual: deuda 200.
+Después de cinco manos:
+Se permite pagar deuda.
+Se calcula interés sobre lo restante.
+Avanza la ronda.
+Después de la cuarta se evalúa victoria o derrota.
+Paso 9: máquina de estados
+La máquina impide acciones incorrectas.
+Ejemplos:
+Durante apuesta se puede confirmar o cancelar.
+Durante reparto no se puede pedir.
+Durante PlayerTurn se puede pedir o plantarse.
+Durante DealerTurn no se puede usar input de cartas.
+Durante Resolution no se paga dos veces.
+Cómo verificamos esta fase sin hacer una UI temporal
+Con tests automáticos.
+Ejemplo de test:
+Dado:
+Dinero 50
+Apuesta 10
+Victoria normal
+
+Esperado:
+Dinero final 59,20
+Otro:
+Dada una seed específica
+Cuando se genera el mazo dos veces
+El orden debe ser idéntico
+Otro:
+Si el usuario envía dos veces “Pedir”
+mientras la primera acción se está resolviendo,
+sólo debe salir una carta.
+Qué queda listo al terminar
+El “cerebro” final del juego:
+Mazo.
+Cartas numéricas.
+Mano.
+Dealer.
+Apuestas.
+Dinero.
+Deuda.
+Intereses.
+Rondas.
+Ciclos.
+Final mecánico.
+Reproducibilidad.
+Estados.
+Todavía no existe una mesa visual completa, pero el reglamento es funcional y definitivo.
+
+Gate A — El punto en que debemos detenernos
+Aquí debe entregar su trabajo la persona que diseña:
+Cinco cartas especiales.
+Cinco objetos.
+Presión.
+No basta con entregar nombres. Cada contenido debe indicar exactamente qué hace.
+Ejemplo de una definición incompleta
+Cerilla:
+Revela una carta.
+Faltan respuestas:
+¿Qué carta?
+¿La oculta del Dealer o la siguiente?
+¿Cuándo se usa?
+¿Cuántos usos?
+¿Se consume?
+¿Genera Presión?
+¿Puede usarse más de una vez por mano?
+¿Qué ocurre si la carta ya está revelada?
+Ejemplo de definición lista para programar
+ID: ITEM_MATCH
+Nombre: Cerilla
+Precio: 8 monedas
+Tipo: Consumible
+Usos: 1
+Fase: Turno del jugador
+Objetivo: Carta oculta del Dealer
+Efecto: Revela permanentemente la carta durante la mano actual
+Presión: +5
+Consume acción: No
+Puede cancelarse: Sí, antes de confirmar
+Stacking: No aplicable
+Si no existe carta oculta: la acción se considera inválida y no consume el objeto
+Con este nivel de detalle sí puede programarse sin inventar.
+Qué sucede si el contenido no está listo
+El proyecto se detiene después de Fase 2.
+No se pierde trabajo. Queda terminado:
+Proyecto estructurado.
+Cámara.
+Input.
+Escenas.
+Interacción.
+Reglas numéricas.
+Economía.
+Dealer.
+Rondas y ciclos.
+Tests.
+No se empieza un sistema genérico de efectos basado en suposiciones.
+
+Fase 3 — Implementar el contenido aprobado
+Una vez que Gate A está completo, se programa:
+Cartas especiales
+Cuando aparece una:
+Se pausa el reparto normal.
+Se muestra la especial.
+Se lee su definición.
+Se ejecuta o presenta la elección.
+Se retira de la ronda.
+Se roba el reemplazo numérico.
+Continúa la mano.
+Objetos
+Flujo:
+El jugador selecciona el objeto.
+El juego verifica que pueda usarse en esa fase.
+Se selecciona objetivo si corresponde.
+Se muestra una previsualización.
+El jugador confirma o cancela.
+Al confirmar se consume el uso.
+Se aplica el efecto.
+Se actualiza inventario.
+Presión
+Presión escuchará sucesos reales:
+El jugador pidió carta.
+El jugador hizo all-in.
+El jugador perdió.
+El jugador aceptó una oferta.
+Ejemplo:
+Presión actual: 40.
+El jugador pide carta: +10.
+Nueva presión: 50.
+Se entra en Distorsión.
+Entonces Presentation recibe el cambio:
+UI actualiza el valor.
+Audio cambia.
+Luz reacciona.
+Dealer comenta.
+Las cartas pueden mostrar distorsión.
+Por qué esperamos para hacer esta fase
+El sistema de efectos depende de lo que realmente necesiten las cartas y objetos.
+Si lo hacemos antes, podríamos crear una arquitectura que sólo contemple:
+Modificar dinero.
+Reducir presión.
+Y luego descubrir que una carta necesita:
+Cambiar objetivo.
+Intercambiar manos.
+Cancelar una ronda.
+Modificar la siguiente seed.
+Elegir entre dos cartas.
+Esperar evita reconstruir el sistema.
+
+Fase 4 — Llevar las reglas a la mesa
+Aquí el jugador finalmente ve y utiliza el núcleo completo.
+Se implementa
+Carta 3D reutilizable.
+Cara según palo/rango.
+Carta especial visual.
+Espacios de mano.
+Reparto animado.
+Carta oculta del Dealer.
+Fichas/apuesta.
+Botones.
+Selección de objetos.
+Barra o indicador de Presión.
+Mensajes del Dealer.
+Resolución animada.
+Regla fundamental
+El dominio decide primero y la animación representa después.
+Ejemplo:
+Dominio:
+La siguiente carta es 8.
+
+Presentación:
+El Dealer toma una carta.
+La mueve sobre la mesa.
+La gira.
+Muestra un 8.
+Si la animación falla, la regla sigue siendo 8.
+
+Fase 5 — Prototipo completo
+Se conectan todos los loops:
+Explorar habitación
+→ revisar recursos
+→ comprar/equipar
+→ sentarse
+→ apostar
+→ jugar
+→ pagar deuda
+→ abandonar o continuar
+→ observar cambios
+Al terminar esta fase tendremos el contenido mínimo del GDD:
+Habitación.
+Dealer.
+Mesa.
+Cartas.
+Objetos.
+Presión.
+Inventario.
+Tienda.
+Eventos.
+Diálogos reactivos.
+Final provisional.
+Este es el primer momento apropiado para decidir si el juego es divertido.
+
+Fase 6 — Convertir el prototipo en demo
+El prototipo valida reglas. La demo debe presentarlas con calidad pública.
+Se agregan:
+Dirección artística final.
+Iluminación reactiva.
+Estados de habitación.
+Guantes del Dealer.
+Sonidos.
+Música.
+Diálogo narrativo.
+Tutorial.
+Menú y opciones completos.
+Guardado.
+Accesibilidad.
+Optimización.
+Final narrativo.
+Créditos.
+No se cambia el núcleo salvo correcciones de balance. Principalmente se produce contenido y presentación.
+

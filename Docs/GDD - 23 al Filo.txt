@@ -1,0 +1,849 @@
+23 al Filo
+1. Descripción general
+23 al Filo es un roguelike psicológico de cartas, gestión de recursos y exploración en primera persona.
+El jugador controla a una persona común, ahogada por las deudas, que queda atrapada dentro de un sueño recurrente. En una habitación oscura conoce a una entidad demoníaca que le ofrece una oportunidad para resolver sus problemas financieros: ganar suficiente dinero participando en un extraño juego de cartas.
+El jugador deberá decidir constantemente entre arriesgar sus ganancias para obtener más dinero o retirarse antes de perderlo todo.
+Entre partidas podrá explorar la habitación, comprar objetos, administrar su inventario y descubrir información sobre el origen del dealer, la naturaleza del sueño y el pasado del protagonista.
+Cada derrota acerca al protagonista a perder toda esperanza.
+Cada victoria lo acerca a la libertad.
+
+2. Género
+Roguelike de cartas.
+Terror psicológico.
+Gestión de recursos.
+Exploración narrativa.
+Estrategia basada en riesgo y recompensa.
+
+3. Premisa narrativa
+El protagonista atraviesa una grave crisis financiera. Sus deudas afectan su vida personal, emocional y posiblemente familiar.
+Una noche se queda dormido y despierta dentro de una habitación desconocida.
+En el centro del lugar hay una mesa iluminada por una lámpara. Del otro lado se encuentra una entidad demoníaca conocida como el Dealer.
+El Dealer le propone un trato:
+Jugar partidas de cartas, ganar dinero y reunir lo necesario para pagar todas sus deudas.
+La entidad nunca obliga directamente al jugador a participar. Siempre le permite decidir:
+cuánto apostar;
+cuándo continuar;
+cuándo retirarse;
+qué objetos utilizar;
+qué sacrificios aceptar.
+Sin embargo, abandonar el juego sin pagar la deuda provoca que el protagonista vuelva a despertar dentro de la misma habitación.
+A medida que avanza la historia, el jugador deberá descubrir:
+qué es realmente el sueño;
+quién o qué es el Dealer;
+por qué el protagonista fue elegido;
+si otras personas jugaron anteriormente;
+si pagar la deuda será suficiente para escapar;
+qué precio real tienen las ayudas del Dealer.
+
+4. Fantasía del jugador
+El jugador no interpreta a un héroe ni a una persona con habilidades sobrenaturales.
+Es alguien vulnerable que intenta sobrevivir mediante:
+observación;
+administración de recursos;
+conocimiento de las reglas;
+manipulación de probabilidades;
+lectura del comportamiento del Dealer;
+utilización estratégica de objetos;
+toma de decisiones bajo presión.
+La fantasía principal consiste en intentar superar intelectualmente a una entidad que conoce las debilidades del protagonista y utiliza su desesperación para mantenerlo jugando.
+
+5. Pilares principales
+5.1. Riesgo contra recompensa
+Toda decisión importante debe implicar una ventaja y una posible consecuencia.
+Ejemplos:
+apostar más dinero permite ganar más, pero aumenta la pérdida potencial;
+comprar objetos mejora las probabilidades, pero reduce el dinero disponible;
+pagar parte de la deuda disminuye el objetivo final, pero deja menos capital para apostar;
+aceptar contratos especiales ofrece beneficios inmediatos, pero introduce penalizaciones futuras;
+investigar la habitación puede revelar información o provocar eventos peligrosos.
+
+5.2. Información incompleta
+El jugador no conoce todos los resultados posibles.
+El Dealer, las cartas y la habitación ocultan información, pero el jugador puede aprender patrones mediante la observación.
+Puede descubrir:
+probabilidades aproximadas;
+cartas restantes;
+señales del Dealer;
+eventos posibles;
+consecuencias de los objetos;
+reglas ocultas;
+condiciones de determinados finales.
+
+5.3. Tentación
+El Dealer debe presentar oportunidades aparentemente beneficiosas.
+Sus propuestas pueden incluir:
+multiplicadores de dinero;
+préstamos;
+protección contra derrotas;
+cartas especiales;
+objetos malditos;
+reducción temporal de intereses;
+segundas oportunidades.
+Cada ayuda debe tener un precio directo o una consecuencia futura.
+
+5.4. Deterioro psicológico
+La habitación representa parcialmente el estado mental del protagonista.
+A medida que pierde, acepta pactos o acumula deudas, el entorno puede cambiar:
+luces inestables;
+ruidos detrás de las paredes;
+objetos fuera de lugar;
+mensajes en el televisor;
+voces en la radio;
+números incorrectos;
+cartas distorsionadas;
+puertas que conducen al mismo lugar;
+apariciones breves del verdadero cuerpo del Dealer.
+
+5.5. Repetición con cambios
+El jugador regresa constantemente a la misma habitación y a la misma mesa.
+Sin embargo, cada ciclo puede modificar:
+diálogos;
+cartas;
+objetos;
+eventos;
+iluminación;
+decoración;
+reglas;
+comportamiento del Dealer;
+información narrativa;
+finales disponibles.
+
+
+
+5.6. Reacción visual del entorno
+
+Según sus acciones, el jugador tendrá un cambio del entorno visual en la habitación y en los guantes del Dealer. En sí, los guantes del Dealer son blancos, pero pueden cambiar según lo que ofrece, lo que juegue el jugador, o las consecuencias de la partida.
+
+Los cambios pueden ser a:
+
+Azul: por saldo positivo, buena mano de juego, carta de esperanza, buen estado del jugador, ofertas especiales.
+
+Morado: momentos de presión, tentaciones, ofertas riesgosas, elecciones claves del jugador, riesgo a que el saldo pase a negativo.
+
+Rojo: saldo negativo, presión alta, deterioro psicológico, distorsión al jugador. 
+
+6. Público objetivo
+Perfil demográfico
+Jugadores de entre 16 y 35 años interesados en:
+estrategia;
+juegos de cartas;
+terror psicológico;
+roguelikes;
+gestión de recursos;
+narrativas oscuras;
+juegos independientes.
+
+Perfil psicográfico
+Personas que disfrutan:
+tomar decisiones difíciles;
+asumir riesgos calculados;
+descubrir secretos;
+experimentar con estrategias;
+administrar recursos limitados;
+interpretar historias ambientales;
+completar múltiples partidas;
+desbloquear diferentes finales.
+
+Perfil geográfico
+Mercado global, con un enfoque inicial en:
+Latinoamérica;
+España;
+comunidades hispanohablantes;
+público internacional de juegos independientes y terror psicológico.
+
+7. Personajes
+7.1. Protagonista
+Una persona anónima atrapada por problemas financieros.
+No posee poderes ni conocimientos especiales.
+Su historia se descubre mediante:
+facturas;
+mensajes;
+llamadas;
+fotografías;
+recibos;
+documentos;
+recuerdos;
+conversaciones con el Dealer;
+transmisiones de radio;
+imágenes del televisor.
+La deuda puede estar relacionada con varios factores:
+pérdida de empleo;
+malas decisiones financieras;
+préstamos;
+gastos familiares;
+una estafa;
+problemas médicos;
+apuestas anteriores;
+intereses acumulados.
+El protagonista no debería representarse únicamente como una víctima ni como una persona irresponsable. Su situación debe tener matices.
+
+7.2. Dealer
+Una entidad demoníaca abstracta que permanece parcialmente oculta en la oscuridad.
+Representa:
+la tentación;
+la codicia;
+la desesperación;
+el riesgo;
+el autoengaño;
+la necesidad de obtener una solución rápida.
+El Dealer nunca obliga al jugador.
+Siempre presenta las decisiones como elecciones voluntarias.
+Su personalidad debe ser:
+educada;
+paciente;
+inteligente;
+manipuladora;
+aparentemente justa;
+ocasionalmente compasiva.
+Debe recordar cómo juega el usuario y reaccionar a sus hábitos.
+Ejemplos:
+si apuesta mucho, lo felicita por su valentía;
+si se retira constantemente, cuestiona su ambición;
+si utiliza muchos objetos, duda de su confianza;
+si pierde varias veces, ofrece ayuda;
+si investiga demasiado, se vuelve más reservado;
+si descubre una regla oculta, muestra respeto.
+
+8. Objetivo principal
+El objetivo central consiste en reunir suficiente dinero para pagar la deuda y escapar definitivamente del sueño.
+Durante el proceso, el jugador deberá:
+ganar partidas;
+proteger sus recursos;
+comprar objetos;
+reducir la deuda;
+controlar los intereses;
+administrar su esperanza;
+investigar la habitación;
+comprender al Dealer;
+tomar decisiones narrativas.
+Dependiendo de sus acciones, podrá desbloquear distintos finales.
+
+9. Core Loop
+El ciclo principal de juego es el siguiente:
+Despertar en la habitación.
+Revisar la deuda y los recursos disponibles.
+Explorar el escenario.
+Organizar el inventario.
+Comprar o equipar objetos.
+Sentarse en la mesa.
+Elegir cuánto dinero apostar.
+Jugar una ronda de cartas.
+Ganar o perder dinero.
+Decidir entre retirarse o continuar.
+Pagar parte de la deuda o reinvertir las ganancias.
+Descubrir nueva información.
+Prepararse para una nueva partida.
+El ciclo se repite hasta que el jugador:
+paga completamente la deuda;
+pierde toda posibilidad de continuar;
+acepta un pacto definitivo;
+descubre una forma alternativa de escapar;
+alcanza un final especial.
+
+10. Estructura de una sesión
+10.1. Despertar
+El jugador aparece en la habitación.
+Puede observar cambios provocados por sus decisiones anteriores.
+
+10.2. Preparación
+Antes de jugar puede:
+revisar objetos;
+guardar o retirar recursos;
+comprar mejoras;
+seleccionar dinero para apostar;
+leer documentos;
+escuchar la radio;
+inspeccionar la habitación.
+
+10.3. Apuesta
+El jugador elige cuánto dinero arriesgar.
+Las apuestas elevadas pueden:
+aumentar las recompensas;
+activar eventos;
+desbloquear cartas;
+alterar al Dealer;
+aumentar la presión;
+habilitar contratos especiales.
+
+10.4. Ronda
+El jugador recibe cartas y debe decidir entre:
+pedir una carta;
+quedarse;
+utilizar un objeto;
+activar una carta especial;
+aceptar una propuesta del Dealer;
+retirarse, cuando las reglas lo permitan.
+
+10.5. Resolución
+La ronda puede terminar en:
+victoria;
+derrota;
+empate;
+evento especial;
+pacto;
+modificación de las reglas.
+El resultado afecta al dinero, la deuda, la esperanza, la lucidez y la relación con el Dealer.
+
+10.6. Continuación o retirada
+Después de cada ronda, el jugador decide:
+conservar lo ganado;
+volver a apostar;
+aumentar la apuesta;
+pagar una parte de la deuda;
+comprar objetos;
+aceptar un desafío;
+abandonar temporalmente la mesa.
+
+11. Sistema de cartas
+11.1. Cartas numéricas
+Forman la base del juego.
+El objetivo general consiste en acercarse al valor 23 sin superar el límite.
+Para diferenciarlo del Blackjack, las cartas pueden combinarse con efectos, estados y decisiones adicionales.
+
+11.2. Cartas positivas
+Ejemplos:
+elegir entre dos cartas;
+reducir el valor de una carta;
+proteger una parte de la apuesta;
+repetir un robo;
+revelar la siguiente carta;
+bloquear una acción del Dealer.
+
+11.3. Cartas negativas
+Ejemplos:
+aumentar el valor de una carta;
+duplicar una pérdida;
+bloquear un objeto;
+ocultar números;
+impedir la retirada;
+transferir una carta al Dealer.
+
+11.4. Cartas de evento
+Cambian temporalmente las reglas.
+Ejemplos:
+apagón;
+cartas boca abajo;
+tiempo limitado;
+intercambio de manos;
+cambio del número objetivo;
+apuesta obligatoria;
+objeto bloqueado;
+robo simultáneo.
+
+11.5. Cartas malditas
+Otorgan ventajas fuertes acompañadas de consecuencias.
+Ejemplos:
+ganar automáticamente una ronda, pero duplicar la siguiente apuesta mínima;
+ver la mano del Dealer a cambio de perder lucidez;
+recuperar una pérdida aumentando la deuda;
+superar temporalmente el límite de 23 a cambio de esperanza;
+eliminar una carta negativa y añadir dos cartas desconocidas.
+
+12. Mecánica de presión
+Cada carta pedida aumenta una barra de presión.
+La presión representa:
+el estrés del protagonista;
+la atención del Dealer;
+el peligro de la ronda;
+el deterioro de la realidad.
+A mayor presión:
+aumentan las recompensas;
+aparecen cartas más peligrosas;
+pueden activarse eventos;
+algunos objetos mejoran;
+el entorno se distorsiona;
+el Dealer revela más de sí mismo;
+ciertas decisiones dejan de estar disponibles.
+Esto convierte cada robo en una decisión que afecta algo más que el valor total de la mano.
+
+13. Sistema de deuda
+La deuda no funciona solamente como una cifra final.
+Puede componerse de:
+deuda principal;
+intereses;
+penalizaciones;
+préstamos del Dealer;
+contratos;
+deudas ocultas.
+Después de ciertas rondas o ciclos, la deuda puede generar intereses.
+El jugador deberá decidir entre:
+pagar inmediatamente;
+reservar dinero;
+invertir en objetos;
+aceptar un préstamo;
+congelar los intereses mediante un contrato;
+arriesgarse a conseguir una suma mayor.
+
+14. Recursos
+Dinero disponible
+Se utiliza para:
+apostar;
+comprar objetos;
+pagar deuda;
+activar ciertos efectos.
+
+Dinero protegido
+Puede almacenarse fuera de la mesa.
+No se pierde durante derrotas normales, aunque algunos eventos podrían afectarlo.
+
+Esperanza
+Representa la voluntad del protagonista para continuar.
+Disminuye por:
+derrotas;
+eventos traumáticos;
+deuda creciente;
+uso de objetos malditos;
+decisiones narrativas.
+Aumenta mediante:
+pagos importantes;
+recuerdos;
+victorias;
+rechazar determinados pactos.
+Si llega a cero puede activar un final negativo.
+
+Lucidez
+Representa la capacidad del protagonista para comprender el sueño.
+Una lucidez alta permite:
+descubrir engaños;
+detectar cartas falsas;
+interpretar señales;
+desbloquear diálogos.
+Una lucidez baja puede:
+distorsionar números;
+ocultar textos;
+generar sonidos falsos;
+modificar objetos;
+alterar la percepción de la habitación.
+
+Favor del Dealer
+Variable principalmente oculta.
+Aumenta cuando el jugador:
+acepta pactos;
+utiliza cartas malditas;
+realiza apuestas extremas;
+depende de préstamos;
+sigue las recomendaciones del Dealer.
+Puede desbloquear objetos y ventajas, pero también acercar al jugador a finales negativos.
+
+15. Sistema de objetos
+Los objetos deben modificar decisiones y probabilidades, sin asegurar automáticamente una victoria.
+Objetos consumibles
+Cerilla: revela una carta oculta.
+Café frío: permite realizar una acción adicional.
+Moneda marcada: repite el último robo.
+Analgésico: reduce presión, pero disminuye lucidez.
+Ticket de empeño: protege una parte de la apuesta.
+Cigarrillo: retrasa un evento negativo.
+
+Objetos reutilizables
+Calculadora rota: muestra probabilidades aproximadas.
+Reloj detenido: aumenta el tiempo para decidir.
+Fotografía familiar: protege la esperanza.
+Llavero: abre elementos de la habitación.
+Radio portátil: detecta eventos cercanos.
+
+Objetos malditos
+Diente de oro: aumenta ganancias e intereses.
+Contrato sin firma: anula una derrota y genera una deuda desconocida.
+Ojo de vidrio: revela cartas, pero puede mostrar información falsa.
+Guante morado: intercambia una carta con el Dealer.
+Moneda negra: permite apostar dinero prestado.
+
+16. Inventario y almacenamiento
+El jugador posee un inventario limitado.
+Debe decidir:
+qué llevar a la mesa;
+qué almacenar;
+qué vender;
+qué utilizar;
+qué conservar para eventos futuros.
+El mueble de la habitación funciona como almacenamiento persistente.
+Algunos objetos pueden ser necesarios para:
+desbloquear recuerdos;
+abrir zonas;
+activar conversaciones;
+alterar finales;
+descubrir secretos.
+
+17. Comercio
+El estante de compra permite adquirir objetos y mejoras.
+Los precios pueden cambiar según:
+deuda restante;
+cantidad de victorias;
+derrotas acumuladas;
+relación con el Dealer;
+esperanza;
+objetos comprados anteriormente.
+Algunas ofertas pueden requerir recursos distintos al dinero:
+esperanza;
+lucidez;
+recuerdos;
+espacios de inventario;
+aumento de deuda;
+cartas negativas añadidas al mazo.
+
+18. Exploración de la habitación
+La habitación funciona como centro narrativo y mecánico.
+Mesa de juego
+Lugar donde se desarrollan las partidas.
+
+Estante de compra
+Contiene objetos, mejoras y ofertas especiales.
+
+Mueble de almacenamiento
+Permite organizar y guardar objetos.
+
+Televisor CRT
+Puede mostrar:
+noticias;
+recuerdos;
+mensajes;
+futuros posibles;
+imágenes de otros jugadores;
+pistas sobre cartas.
+
+Radio
+Puede transmitir:
+llamadas;
+voces;
+números;
+advertencias;
+conversaciones;
+mensajes del mundo real.
+
+Puerta
+Representa la posibilidad de escapar.
+Puede:
+permanecer cerrada;
+conducir a la misma habitación;
+llevar a recuerdos;
+abrir espacios secretos;
+activar finales.
+
+Teléfono
+Permite recibir llamadas relacionadas con:
+cobradores;
+familiares;
+bancos;
+empleadores;
+personas del pasado.
+El jugador puede decidir responder o ignorarlas.
+
+Reloj
+Puede avanzar, detenerse o retroceder.
+Sus cambios sirven como pista sobre el funcionamiento del sueño.
+
+Facturas y documentos
+Revelan progresivamente:
+el origen de la deuda;
+la vida del protagonista;
+decisiones pasadas;
+contradicciones narrativas;
+conexiones con el Dealer.
+
+19. Evolución de la habitación
+Estado inicial
+habitación limpia;
+oscuridad controlada;
+pocos objetos;
+silencio;
+Dealer parcialmente visible.
+
+Deterioro moderado
+humedad;
+interferencias;
+facturas acumuladas;
+sombras extrañas;
+muebles desplazados;
+sonidos detrás de las paredes.
+
+Deterioro elevado
+números escritos en las paredes;
+objetos deformados;
+puertas repetidas;
+reflejos incorrectos;
+voz del Dealer fuera de la mesa;
+luces inestables.
+
+Estado final
+La habitación puede transformarse en:
+un casino abandonado;
+la casa del protagonista;
+una oficina de cobranza;
+una sala médica;
+un espacio abstracto;
+una versión infinita de la propia habitación.
+
+20. Progresión narrativa
+Acto I: La oferta
+El jugador conoce:
+al Dealer;
+la habitación;
+las reglas básicas;
+la deuda;
+los primeros objetos.
+El Dealer se comporta de manera amable y profesional.
+
+Acto II: Los intereses
+Aparecen:
+nuevas cartas;
+contratos;
+intereses;
+eventos;
+recuerdos;
+contradicciones.
+El jugador descubre que posiblemente no es la primera persona que participa.
+
+Acto III: El precio
+Se revelan:
+consecuencias de los pactos;
+origen de algunos objetos;
+relación entre el protagonista y el Dealer;
+verdadera función de la habitación;
+naturaleza de la deuda.
+
+Acto IV: La última apuesta
+El jugador debe tomar una decisión definitiva:
+pagar;
+desafiar al Dealer;
+aceptar su oferta;
+destruir el juego;
+renunciar al dinero;
+quedarse voluntariamente;
+ayudar a otros jugadores.
+
+21. Relación con el Dealer
+La relación puede construirse mediante variables ocultas.
+Respeto
+Aumenta cuando el jugador:
+descubre patrones;
+juega estratégicamente;
+derrota desafíos;
+se retira en buenos momentos.
+
+Codicia
+Aumenta cuando:
+apuesta grandes cantidades;
+utiliza multiplicadores;
+acepta cartas malditas;
+sacrifica recursos importantes.
+
+Dependencia
+Aumenta cuando:
+utiliza préstamos;
+acepta ayudas;
+revive mediante contratos;
+compra objetos del Dealer.
+
+Desconfianza
+Aumenta cuando:
+investiga la habitación;
+rechaza ofertas;
+cuestiona las reglas;
+intenta escapar;
+descubre trampas.
+Estas variables modifican diálogos, eventos, objetos y finales.
+
+22. Eventos
+Eventos durante las partidas
+apagón;
+cambio de objetivo;
+apuesta duplicada;
+cartas ocultas;
+intercambio de manos;
+desaparición temporal del Dealer;
+decisiones con límite de tiempo;
+aparición de cartas imposibles.
+
+Eventos entre partidas
+llamadas;
+nuevos mensajes;
+objetos desaparecidos;
+aumento de intereses;
+cambios en la habitación;
+puerta abierta;
+nuevas ofertas;
+ruidos dentro del mueble.
+
+Eventos raros
+otro jugador sentado en la mesa;
+intercambio de roles con el Dealer;
+partidas sin dinero;
+apuestas de recuerdos;
+cartas encontradas fuera de la mesa;
+errores aparentes del Dealer.
+
+23. Modos de juego
+Modo Historia
+Modo principal.
+El jugador debe pagar la deuda, descubrir la verdad y alcanzar uno de los finales.
+
+Endless Debt
+Modo infinito.
+Características:
+deuda creciente;
+dificultad progresiva;
+eventos más frecuentes;
+cartas más peligrosas;
+objetivo de sobrevivir la mayor cantidad de rondas;
+puntuación basada en riqueza y riesgo.
+
+Challenge Mode
+Desafíos con reglas especiales.
+Ejemplos:
+límite reducido;
+cartas malditas obligatorias;
+poco dinero inicial;
+intereses acelerados;
+inventario reducido;
+sin posibilidad de retirarse;
+tiempo limitado;
+eventos frecuentes;
+objetos aleatorios.
+
+Desafío diario
+Todos los jugadores reciben:
+la misma semilla;
+el mismo mazo;
+los mismos objetos;
+la misma deuda;
+los mismos eventos.
+El objetivo consiste en comparar estrategias y puntuaciones.
+
+24. Finales
+Libertad aparente
+El protagonista paga la deuda y despierta, pero encuentra una carta del Dealer en el mundo real.
+
+Libertad real
+El protagonista paga la deuda sin aceptar pactos irreversibles y comprende el significado del sueño.
+
+Nuevo Dealer
+El jugador adopta completamente la filosofía del juego y reemplaza a la entidad.
+
+Deudor eterno
+El protagonista depende tanto de los préstamos y contratos que queda atrapado para siempre.
+
+Rendición
+La esperanza llega a cero y el protagonista deja de intentar escapar.
+
+Ruptura
+El jugador descubre que la única forma de ganar consiste en rechazar la lógica del Dealer y destruir el sistema.
+
+Pago alternativo
+La deuda es pagada entregando recuerdos, identidad o vínculos personales.
+
+Sueño compartido
+El protagonista descubre a otros jugadores atrapados y decide ayudarlos en lugar de escapar solo.
+
+25. Dirección artística
+Estilo visual
+3D low poly.
+Escenario reducido.
+Iluminación contrastada.
+Materiales deteriorados.
+Animaciones simples y expresivas.
+Uso limitado de efectos visuales.
+
+Iluminación
+La principal fuente de luz es una lámpara sobre la mesa.
+La iluminación debe destacar:
+cartas;
+guantes del Dealer;
+fichas;
+objetos importantes;
+deformaciones del entorno.
+
+Dealer
+Debe mantener una apariencia abstracta.
+Su cuerpo nunca se muestra completamente.
+Puede manifestarse mediante:
+cubo morado;
+guantes;
+sombra;
+reflejos;
+distorsiones;
+movimientos precisos.
+
+26. Diseño sonoro
+Ambiente
+zumbido eléctrico;
+lámpara defectuosa;
+madera;
+respiraciones;
+reloj;
+interferencias;
+sonidos lejanos;
+silencios prolongados.
+
+Sonidos de la mesa
+cartas sobre madera;
+monedas;
+fichas;
+movimientos de los guantes;
+latidos;
+pausas antes del resultado.
+
+Música
+La música debe utilizarse de manera limitada.
+Puede incluir:
+ambiente minimalista;
+sonidos industriales;
+capas de tensión;
+música dinámica según la apuesta;
+silencio en decisiones importantes;
+distorsiones cuando disminuye la lucidez.
+
+27. Controles e interacción
+El juego está pensado inicialmente para teclado y mouse.
+El jugador puede:
+caminar por la habitación;
+mirar alrededor;
+interactuar con objetos;
+sentarse en la mesa;
+seleccionar cartas;
+utilizar objetos;
+organizar el inventario;
+comprar mejoras;
+leer documentos;
+investigar elementos del escenario.
+
+28. Alcance para un prototipo
+La primera versión podría centrarse en validar el sistema de cartas y la tensión de las decisiones.
+Contenido mínimo
+una habitación;
+un Dealer;
+una lámpara;
+una mesa;
+sistema de apuestas;
+cartas numéricas;
+cinco cartas especiales;
+cinco objetos;
+dinero;
+deuda;
+presión;
+inventario básico;
+tienda;
+tres eventos;
+diálogos reactivos;
+un final provisional.
+
+Objetivo del prototipo
+Comprobar si resulta divertido:
+pedir cartas;
+quedarse;
+utilizar objetos;
+aumentar apuestas;
+retirarse;
+proteger dinero;
+pagar deuda;
+interactuar con el Dealer.
+Los modos adicionales, la campaña completa y los múltiples finales deberían desarrollarse después de validar este núcleo.
+
+29. Propuesta breve del juego
+23 al Filo es un roguelike psicológico de cartas en primera persona donde una persona endeudada debe apostar contra una entidad demoníaca dentro de un sueño recurrente.
+Para escapar tendrá que ganar suficiente dinero para pagar su deuda, administrar objetos limitados y decidir constantemente cuánto está dispuesta a arriesgar.
+Entre partidas podrá explorar una habitación que se deteriora junt
+o con su mente, descubrir secretos y comprender las verdaderas intenciones del Dealer.
+El demonio nunca obliga al jugador a participar.
+Solo se asegura de que siempre necesite jugar una ronda más.
+

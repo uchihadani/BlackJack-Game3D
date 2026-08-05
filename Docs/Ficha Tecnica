@@ -1,0 +1,1027 @@
+Especificación de reglas para el prototipo
+Los siguientes valores representan la configuración inicial de la versión demo. Deberán poder modificarse desde Unity mediante archivos de configuración o ScriptableObjects, ya que el balance definitivo dependerá de las pruebas con jugadores.
+
+1. Terminología de la partida
+Para evitar confusiones entre jugadas, rondas y partidas, se utilizarán los siguientes términos:
+Mano
+Una mano representa un enfrentamiento individual contra el Dealer.
+Incluye:
+Selección de la apuesta.
+Reparto de cartas.
+Turno del jugador.
+Turno del Dealer.
+Resolución del resultado.
+Pago de ganancias o pérdida de la apuesta.
+Cada mano utiliza una apuesta independiente.
+Ronda
+Una ronda está compuesta por un máximo de cinco manos.
+Después de cada mano, el jugador puede:
+pagar una parte de su deuda;
+organizar sus objetos;
+proteger dinero;
+continuar con la siguiente mano;
+abandonar la ronda anticipadamente.
+Si abandona la ronda, conserva el dinero que no haya apostado, pero pierde las manos restantes y consume igualmente esa ronda.
+Al terminar o abandonar una ronda se generan los intereses correspondientes.
+Ciclo de deuda
+Un ciclo de deuda está formado por un máximo de cuatro rondas.
+Durante ese tiempo, el jugador debe pagar por completo la deuda actual.
+Si paga la deuda antes de terminar las cuatro rondas, supera ese nivel y comienza un nuevo ciclo con una deuda mayor.
+Si termina la cuarta ronda sin haber pagado la deuda, se evalúa una derrota o un final negativo según sus valores de esperanza, lucidez y relación con el Dealer.
+Partida o run
+La partida completa comienza cuando el protagonista despierta en la habitación y termina cuando:
+alcanza uno de los finales;
+pierde toda esperanza;
+queda atrapado por la deuda;
+acepta un pacto definitivo;
+encuentra una forma de escapar.
+Una misma run puede contener varios ciclos de deuda.
+
+2. Sistema de cartas
+2.1. Composición del mazo
+El mazo principal estará formado por 52 cartas numéricas tradicionales:
+Cuatro cartas de cada valor del 2 al 10.
+Cuatro cartas J.
+Cuatro cartas Q.
+Cuatro cartas K.
+Cuatro ases.
+Los palos serán:
+corazones;
+diamantes;
+tréboles;
+picas.
+Los palos no tendrán efectos mecánicos durante el primer prototipo, pero se conservarán para permitir futuras cartas, objetos o eventos que interactúen con ellos.
+Valores
+Las cartas del 2 al 10 conservan su valor numérico.
+J, Q y K tienen un valor de 10.
+El As puede valer 1 u 11.
+El valor del As se calcula automáticamente:
+Vale 11 mientras no provoque que la mano supere 23.
+Si la mano supera 23, pasa a valer 1.
+Si existen varios ases, el sistema calcula la combinación más favorable sin superar 23.
+Ejemplos:
+As + 8 + 4 = 23
+El As vale 11.
+
+As + 10 + 8 = 19
+El As vale 1.
+
+As + As + 10 = 22
+Un As vale 11 y el otro vale 1.
+
+
+2.2. Cartas especiales
+La demo contará inicialmente con cinco cartas especiales.
+Estas cinco cartas pueden pertenecer a las siguientes categorías:
+positivas;
+negativas;
+de evento;
+malditas.
+Existirá una sola copia de cada carta especial.
+Por lo tanto, el conjunto total utilizado durante la demo será:
+52 cartas numéricas
++ 5 cartas especiales
+= 57 cartas
+
+Las cartas especiales no aportan un valor numérico a la mano.
+Cuando aparece una:
+Se revela durante unos segundos.
+Se muestra su descripción.
+Se ejecuta o se ofrece su efecto.
+Se retira de la ronda.
+Se roba una carta numérica de reemplazo cuando corresponda.
+Esto evita que una carta de evento ocupe el lugar de una carta necesaria para calcular el valor de la mano.
+Una carta especial retirada no puede volver a aparecer durante esa misma ronda.
+
+2.3. Reinicio del mazo
+El mazo se crea y se baraja al comienzo de cada ronda.
+No se reinicia entre las distintas manos de esa ronda.
+Esto permite que:
+las cartas utilizadas dejen de estar disponibles;
+el jugador recuerde cuáles aparecieron;
+determinados objetos calculen probabilidades aproximadas;
+las cartas especiales no se repitan;
+exista una dimensión estratégica relacionada con las cartas restantes.
+Cuando comienza una nueva ronda, las 52 cartas numéricas y las cartas especiales disponibles regresan al mazo y se vuelve a barajar.
+La semilla utilizada para barajar debe almacenarse para poder reproducir partidas durante las pruebas y para permitir futuros desafíos diarios.
+2.4. Agotamiento del mazo
+
+Antes de comenzar una nueva mano se comprueba la cantidad de cartas numéricas restantes.
+
+Si quedan menos de seis cartas numéricas:
+no comienza una nueva mano;
+la ronda termina anticipadamente;
+la ronda se considera completada;
+se permite realizar el pago posterior correspondiente;
+si la deuda continúa activa, se aplican los intereses normales.
+
+Si el mazo se queda sin cartas numéricas durante una mano activa:
+se toman únicamente las cartas numéricas descartadas de manos anteriores;
+no se incluyen las cartas de la mano actual;
+no regresan las cartas especiales retiradas;
+las cartas recuperadas se barajan utilizando un stream RNG de emergencia
+derivado de la seed de la ronda;
+se registra el rebarajado en el historial de la run;
+la mano continúa normalmente.
+
+Si no existen cartas numéricas disponibles ni descartes reutilizables:
+la mano termina en empate técnico;
+la apuesta se devuelve;
+la ronda finaliza.
+
+
+3. Desarrollo de una mano
+3.1. Apuesta
+Antes de repartir las cartas, el jugador selecciona cuánto dinero desea apostar.
+Una vez confirmada la apuesta:
+el dinero queda bloqueado;
+no puede modificarse durante la mano;
+comienza el reparto;
+pueden activarse objetos o efectos correspondientes a la fase previa al reparto.
+
+3.2. Reparto inicial
+Al comenzar una mano, se reparten seis cartas numéricas:
+Jugador
+Tres cartas visibles.
+Dealer
+Dos cartas visibles.
+Una carta oculta.
+Las cartas especiales que aparezcan durante el reparto se resuelven y son reemplazadas por cartas numéricas.
+
+3.3. Turno del jugador
+Después del reparto inicial, el jugador puede:
+pedir otra carta;
+plantarse;
+utilizar un objeto permitido;
+activar una carta especial;
+aceptar o rechazar una propuesta del Dealer.
+Cada carta adicional aumenta la presión.
+Si el jugador supera el valor de 23, pierde inmediatamente la mano y el Dealer no necesita completar su turno.
+
+3.4. Turno del Dealer
+Cuando el jugador se planta:
+El Dealer revela su carta oculta.
+Se calcula el valor total de su mano.
+El Dealer pide cartas mientras tenga menos de 17.
+Se planta cuando alcanza 17 o más.
+Si supera 23, pierde automáticamente.
+Durante la demo, el límite fijo del Dealer será 17.
+Este valor deberá ser configurable, ya que posteriormente podrán existir variantes:
+Dealer conservador: se planta en 17.
+Dealer equilibrado: se planta en 19.
+Dealer agresivo: se planta en 21.
+Dealer alterado: cambia su límite según la presión o los eventos.
+
+4. Resolución de la mano
+Los resultados se resuelven en el siguiente orden:
+Jugador supera 23
+El jugador pierde inmediatamente toda la cantidad apostada.
+Dealer supera 23
+El jugador gana la mano.
+Ambos poseen el mismo valor válido
+La mano termina en empate.
+La apuesta se devuelve completamente, pero el jugador no obtiene una ganancia adicional.
+Jugador posee un valor mayor
+El jugador gana.
+Dealer posee un valor mayor
+El jugador pierde toda la apuesta.
+No es necesario contemplar el caso en que ambos superan 23, porque si el jugador se pasa, la mano termina antes de que el Dealer actúe.
+
+4.1. Llegar exactamente a 23
+Existen dos tipos de resultado con valor 23.
+23 inicial
+Se obtiene cuando el jugador alcanza exactamente 23 con las tres cartas iniciales.
+Este resultado ofrece una recompensa especial.
+La probabilidad aproximada de que ocurra con un mazo estándar se encuentra alrededor del 8 %, por lo que funciona como un resultado poco frecuente, pero alcanzable.
+23 durante el turno
+Se obtiene cuando el jugador llega a 23 después de pedir una cuarta carta o más.
+El jugador gana la mano, pero recibe la recompensa normal.
+
+5. Economía
+5.1. Dinero inicial
+Al comenzar la run, el jugador recibe:
+Dinero inicial: 50 monedas
+
+El dinero puede utilizarse para:
+realizar apuestas;
+comprar objetos;
+pagar la deuda;
+evitar determinados eventos;
+aceptar ofertas;
+activar algunos efectos.
+
+5.2. Deuda inicial
+El primer ciclo comienza con:
+Deuda inicial: 200 monedas
+
+El jugador dispone de cuatro rondas para pagarla por completo.
+Cada ronda contiene un máximo de cinco manos, por lo que el jugador dispone de hasta veinte manos para completar el primer ciclo de deuda.
+
+5.3. Apuesta mínima y máxima
+Durante la primera ronda:
+Apuesta mínima: 5 monedas
+Apuesta máxima: 20 monedas
+
+La apuesta máxima aumenta en cinco monedas al comenzar cada nueva ronda del mismo ciclo:
+Ronda 1: máximo 20
+Ronda 2: máximo 25
+Ronda 3: máximo 30
+Ronda 4: máximo 35
+
+El jugador nunca puede apostar más dinero del que posee.
+
+5.4. All-in
+El jugador puede seleccionar una apuesta total o all-in.
+El all-in permite apostar todo el dinero disponible, aunque la cantidad supere el máximo normal de la ronda.
+A cambio del riesgo, aplica un multiplicador superior.
+Valores iniciales para la demo:
+Resultado
+Ganancia neta
+Victoria normal
+92 % de la apuesta
+Victoria normal con all-in
+110 % de la apuesta
+23 con tres cartas
+120 % de la apuesta
+23 con tres cartas y all-in
+150 % de la apuesta
+
+Estos valores son independientes de la devolución del dinero apostado.
+
+5.5. Cálculo de recompensas
+La ganancia se divide en:
+devolución de la apuesta;
+ganancia neta adicional.
+Ejemplo con una apuesta de 10 monedas:
+Resultado
+Apuesta devuelta
+Ganancia neta
+Total recibido
+Victoria normal
+10
+9,20
+19,20
+23 inicial
+10
+12
+22
+Empate
+10
+0
+10
+Derrota
+0
+0
+0
+
+Para evitar errores de precisión, el dinero deberá almacenarse internamente como un número entero.
+Ejemplo:
+1 moneda = 100 unidades internas
+10 monedas = 1000 unidades internas
+
+Esto permite representar cantidades como 9,20 sin utilizar valores float.
+5.6. Política de redondeo
+
+Todos los cálculos porcentuales utilizan enteros y puntos base.
+
+100 % = 10.000 puntos base
+92 % = 9.200 puntos base
+110 % = 11.000 puntos base
+120 % = 12.000 puntos base
+150 % = 15.000 puntos base
+15 % = 1.500 puntos base
+
+Cuando el resultado contenga una fracción de la unidad interna,
+se aplica redondeo aritmético al entero más cercano:
+
+Fracción inferior a 0,5: se redondea hacia abajo.
+Fracción igual o superior a 0,5: se redondea hacia arriba.
+
+El redondeo se realiza una sola vez, al finalizar cada operación porcentual.
+Nunca se almacenan fracciones menores a una unidad interna.
+
+
+6. Pago de deuda
+Después de cada mano, el jugador puede pagar una parte de su deuda.
+El pago:
+no consume una mano;
+no consume una ronda;
+reduce inmediatamente la deuda restante;
+disminuye la cantidad sobre la que se calcularán los próximos intereses;
+reduce el dinero disponible para apuestas y compras.
+Ejemplo:
+Deuda actual: 200
+Pago realizado: 50
+Deuda restante: 150
+
+El jugador puede pagar cualquier cantidad válida que posea.
+También puede pagar la deuda utilizando dinero protegido.
+
+7. Intereses
+Los intereses se aplican al finalizar cada ronda.
+También se aplican si el jugador abandona voluntariamente una ronda antes de completar sus cinco manos.
+Para la demo se utilizará:
+Interés por ronda: 15 %
+
+El interés se calcula únicamente sobre la deuda restante.
+Ejemplo:
+Deuda inicial: 200
+El jugador paga: 80
+Deuda restante: 120
+
+Interés:
+120 × 15 % = 18
+
+Nueva deuda:
+138
+
+Los intereses no se aplican cuando la deuda ya fue pagada por completo.
+El juego debe advertir al jugador antes de finalizar la ronda:
+Al terminar esta ronda se aplicará un interés del 15 %.
+
+El interés del 20 % podrá reservarse para:
+dificultades superiores;
+eventos;
+contratos;
+Endless Debt;
+niveles avanzados.
+
+8. Aumento de la deuda
+La deuda no se duplica al finalizar cada ronda.
+La duplicación ocurre únicamente cuando el jugador paga por completo la deuda actual y supera un ciclo.
+Progresión inicial:
+Primer ciclo: 200
+Segundo ciclo: 400
+Tercer ciclo: 800
+Cuarto ciclo: 1600
+
+Cuando comienza un nuevo ciclo:
+la deuda base se duplica;
+el contador de rondas vuelve a cuatro;
+la apuesta máxima regresa a su configuración inicial o se adapta al nivel;
+no se aplican intereses inmediatamente;
+pueden desbloquearse nuevas cartas, eventos y objetos.
+Los intereses y la duplicación cumplen funciones diferentes:
+El interés castiga el paso de las rondas sin pagar.
+La duplicación representa el avance hacia un nivel de deuda más difícil.
+8.1. Finalización de la progresión de la demo
+
+La demo contiene cuatro ciclos de deuda:
+
+Ciclo 1: 200 monedas
+Ciclo 2: 400 monedas
+Ciclo 3: 800 monedas
+Ciclo 4: 1600 monedas
+
+Cuando el jugador paga por completo la deuda del cuarto ciclo:
+
+la run se considera completada;
+no se crea una nueva deuda de 3200;
+no se aplican intereses;
+se bloquea el inicio de nuevas manos;
+se activa el final provisional de la demo;
+se guarda el resultado final de la run.
+
+El estado mecánico correspondiente será DemoCompleted.
+
+
+9. Abandono de una ronda
+Después de resolver una mano, el jugador puede abandonar la ronda actual.
+Al hacerlo:
+conserva el dinero que no haya apostado;
+pierde las manos restantes de esa ronda;
+la ronda se considera consumida;
+se aplica el interés del 15 %;
+queda una ronda menos para pagar la deuda;
+regresa a la habitación o a la fase de preparación.
+Ejemplo:
+El jugador está en la mano 2 de 5.
+Decide abandonar.
+
+Las manos 3, 4 y 5 se pierden.
+Se aplican intereses.
+Comienza la siguiente ronda.
+
+Abandonar no es lo mismo que plantarse:
+Plantarse termina el turno del jugador dentro de una mano.
+Abandonar termina anticipadamente toda la ronda.
+
+10. Dinero protegido
+El jugador puede utilizar objetos para proteger parte de su dinero.
+El jugador elige cuánto desea guardar, pero el objeto determina el límite máximo.
+Ejemplos:
+Objeto básico: protege hasta 20 monedas.
+Objeto mejorado: protege hasta 30 monedas.
+
+El dinero protegido:
+no puede apostarse directamente;
+no se pierde en derrotas normales;
+puede utilizarse para pagar deuda;
+no puede modificarse durante el turno del Dealer;
+puede depositarse o retirarse entre manos;
+puede ser afectado por determinados eventos, contratos u objetos malditos.
+Para apostar dinero protegido, primero debe retirarse del almacenamiento.
+
+11. Derrota y penalizaciones
+Perder una mano
+Cuando pierde una mano, el jugador pierde únicamente la apuesta actual, salvo que exista un efecto adicional.
+No pagar la deuda
+Si termina la cuarta ronda del ciclo sin pagar la deuda, la run entra en una resolución negativa.
+El resultado dependerá de:
+esperanza;
+lucidez;
+dependencia del Dealer;
+pactos aceptados;
+préstamos;
+objetos malditos;
+decisiones narrativas.
+Un posible final consiste en que el protagonista quede atrapado trabajando para el Dealer, pero no será la única consecuencia posible.
+Esperanza en cero
+Puede activar el final de rendición.
+Lucidez crítica
+Puede activar:
+distorsiones permanentes;
+decisiones falsas;
+pérdida de información;
+eventos narrativos;
+finales relacionados con la incapacidad de distinguir el sueño.
+
+12. Sistema de presión
+12.1. Escala
+La presión utilizará una escala de 0 a 100.
+Presión mínima: 0
+Presión máxima: 100
+
+No se utilizará un máximo de 45 %, porque impediría alcanzar los umbrales superiores y bloquear decisiones de manera coherente.
+
+12.2. Generación de presión
+El reparto inicial no aumenta la presión.
+La presión aumenta mediante decisiones y situaciones de riesgo:
+Acción
+Presión
+Pedir una carta adicional
++10
+Pedir después de una derrota previa
++15
+Realizar un all-in
++15
+Utilizar una carta maldita
++10 a +25
+Aceptar una oferta peligrosa
++10 a +20
+Sufrir un evento crítico
++15 a +25
+Perder una mano traumática
++10
+
+Los valores pueden modificarse según:
+estado de la run;
+esperanza;
+lucidez;
+relación con el Dealer;
+cantidad de derrotas consecutivas;
+efectos activos.
+Debemos aclarar si la presión se acumula o no. Ejemplo:
+Sin derrota previa:
+Pedir una carta → +10.
+
+La mano anterior fue derrota:
+Pedir una carta → +15.
+Pedir otra carta en esa misma mano → +15.
+
+Al comenzar la mano posterior:
+Se vuelve a +10, salvo que la mano recién terminada también haya sido derrotada.
+
+
+12.3. Umbrales
+0 a 24 — Control
+No existen penalizaciones mecánicas.
+El entorno se mantiene relativamente estable.
+El Dealer se comporta de manera profesional.
+25 a 49 — Tensión
+Cambia la música.
+La iluminación se vuelve inestable.
+El Dealer realiza comentarios.
+Aumenta ligeramente la probabilidad de eventos.
+Algunos números pueden parpadear, pero siguen siendo legibles.
+50 a 69 — Distorsión
+Aumentan los eventos negativos.
+Las cartas pueden mostrar brevemente valores falsos.
+La lucidez determina si el jugador detecta la distorsión.
+Los objetos que muestran probabilidades pierden precisión.
+El Dealer puede ocultar parte de la información.
+70 a 84 — Crisis
+Algunos objetos de ayuda pueden quedar bloqueados.
+Ciertas ofertas no pueden rechazarse sin pagar.
+La música y el entorno presentan distorsiones fuertes.
+El jugador no puede utilizar objetos destinados a calcular probabilidades.
+El Dealer se vuelve más agresivo.
+85 a 99 — Colapso
+El jugador no puede abandonar la ronda durante una mano activa.
+Pueden ocultarse descripciones de cartas especiales.
+Aumenta considerablemente la posibilidad de un evento crítico.
+Algunos objetos pueden funcionar de manera incorrecta.
+100 — Ruptura
+Se activa una única crisis crítica.
+El entorno sufre una transformación importante.
+Se aplica una penalización narrativa o mecánica.
+Las acciones básicas de pedir carta y plantarse permanecen disponibles.
+La presión se mantiene en 100 hasta que sea reducida mediante un objeto o efecto.
+Nunca deben bloquearse todas las acciones del jugador.
+
+12.4. Presión y valor de las cartas
+La presión no cambia silenciosamente el valor real de una carta.
+En su lugar, puede alterar la forma en que el jugador la percibe.
+Ejemplo:
+Valor real de la carta: 8
+Valor mostrado temporalmente: 6
+
+El cálculo interno continúa utilizando el valor real.
+Solamente un evento o efecto que indique explícitamente “modificar el valor de una carta” puede cambiar su valor mecánico.
+Esto diferencia:
+distorsión visual;
+modificación real de las reglas.
+
+12.5. Relación entre presión y lucidez
+La presión determina cuándo aparecen las distorsiones.
+La lucidez determina cuánto puede confiar el jugador en lo que observa.
+Ejemplos:
+Presión alta y lucidez alta
+La carta muestra un valor falso durante un instante.
+El jugador recibe una señal visual o sonora.
+Puede descubrir el valor real.
+Presión alta y lucidez baja
+El valor falso permanece visible.
+Las advertencias son menos claras.
+Algunos textos pueden desaparecer.
+El jugador puede tomar decisiones utilizando información incorrecta.
+
+12.6. Reducción de presión
+La presión no se reinicia automáticamente después de cada mano o ronda.
+Puede reducirse mediante objetos o decisiones concretas.
+Objeto inicial:
+Pastillas
+Usos: 3
+Reducción por uso: 30 puntos de presión
+
+Otros efectos futuros pueden reducirla:
+pagar una cantidad importante de deuda;
+observar un recuerdo positivo;
+rechazar un pacto;
+ganar con 23;
+utilizar determinados objetos;
+completar eventos narrativos.
+La presión nunca puede ser inferior a cero.
+
+13. Objetos
+13.1. Capacidad
+Durante la demo, el jugador puede:
+Llevar hasta 4 objetos a la mesa.
+Guardar hasta 2 objetos en el almacenamiento.
+
+La capacidad limitada obliga a decidir:
+qué objetos comprar;
+qué objetos llevar;
+cuáles conservar;
+cuáles utilizar;
+cuáles dejar fuera de la ronda.
+
+13.2. Fases de utilización
+Cada objeto debe declarar en qué fases puede utilizarse.
+Preparación
+Antes de elegir la apuesta.
+Previa al reparto
+Después de apostar y antes de recibir las cartas.
+Turno del jugador
+Mientras puede pedir o plantarse.
+Previa al Dealer
+Después de que el jugador se planta y antes de que actúe el Dealer.
+Resolución
+Cuando se determina el resultado de la mano.
+Los objetos de resolución pueden activarse automáticamente.
+Ejemplos:
+Objeto
+Momento de uso
+Cerilla
+Turno del jugador
+Analgésico
+Preparación o turno del jugador
+Ticket de empeño
+Previa al reparto
+Protector de pérdida
+Resolución automática
+Moneda marcada
+Turno del jugador
+Pastillas
+Preparación o turno del jugador
+
+
+13.3. Objetivos válidos
+Cada objeto, carta o efecto debe indicar sobre qué elemento puede actuar.
+Objetivos posibles:
+jugador;
+Dealer;
+carta del jugador;
+carta del Dealer;
+próxima carta del mazo;
+apuesta;
+deuda;
+presión;
+reglas de la mano;
+ronda actual;
+objeto activo.
+Ejemplos:
+Efecto
+Objetivo
+Reducir valor
+Carta propia visible
+Revelar carta
+Carta oculta o próxima carta
+Proteger dinero
+Apuesta actual
+Reducir presión
+Jugador
+Bloquear acción
+Dealer
+Cambiar objetivo de 23
+Reglas de la mano
+Aumentar 
+deuda
+Deuda actual
+
+
+13.4. Catálogo de objetos de la demo
+
+La demo utiliza exactamente cinco objetos.
+Los nombres presentados anteriormente como ejemplos no forman parte
+automáticamente de la demo salvo que aparezcan en esta tabla.
+
+Cada objeto debe declarar:
+ID
+Nombre
+Tipo
+Precio
+Usos
+Fases permitidas
+Objetivos válidos
+Efecto
+Duración
+Categoría de acumulación
+Presión generada o reducida
+Condición de consumo
+
+
+ID
+Objeto
+Tipo
+Precio
+Usos
+Fase
+Objetivo
+Efecto
+IT-01
+Por definir
+Consumible
+—
+—
+—
+—
+—
+IT-02
+Por definir
+Consumible
+—
+—
+—
+—
+—
+IT-03
+Por definir
+Consumible
+—
+—
+—
+—
+—
+IT-04
+Por definir
+Reutilizable
+—
+—
+—
+—
+—
+IT-05
+Por definir
+Protección
+—
+—
+—
+—
+—
+
+
+
+*El sistema de Pastillas ya tiene números definidos —tres usos y −30 de presión—, por lo que probablemente debería ser uno de los cinco. 
+
+
+14. Cartas especiales
+Las cartas especiales pueden beneficiar o perjudicar tanto al jugador como al Dealer.
+Ejemplos:
+aumentar la recompensa;
+disminuir la probabilidad de obtener cartas altas;
+revelar una carta;
+ocultar valores;
+bloquear un objeto;
+cambiar temporalmente el objetivo;
+proteger una parte de la apuesta;
+aumentar la deuda;
+terminar anticipadamente una ronda.
+Las cartas especiales pueden ser:
+Obligatorias
+Se ejecutan inmediatamente.
+Opcionales
+El jugador puede aceptarlas o rechazarlas.
+Ofertas del Dealer
+Pueden rechazarse a cambio de dinero, esperanza, lucidez u otra consecuencia.
+14.1. Catálogo de cartas especiales de la demo
+Para cada carta se debe declarar:
+ID
+Nombre
+Categoría
+Tipo de activación
+Fase
+Objetivo
+Efecto
+Coste
+Coste de rechazo
+Presión generada
+Duración
+Categoría de acumulación
+Consumo de acción, mano o ronda
+
+
+ID
+Carta
+Tipo
+Fase
+Objetivo
+Efecto
+Rechazo
+Presión
+SC-01
+Por definir
+Positiva
+Reparto
+Por definir
+Por definir
+—
+Por definir
+SC-02
+Por definir
+Negativa
+Reparto
+Por definir
+Por definir
+—
+Por definir
+SC-03
+Por definir
+Evento
+Por definir
+Por definir
+Por definir
+Por definir
+Por definir
+SC-04
+Por definir
+Maldita
+Por definir
+Por definir
+Por definir
+Por definir
+Por definir
+SC-05
+Por definir
+Oferta
+Por definir
+Por definir
+Por definir
+Por definir
+Por definir
+
+
+
+
+15. Eventos de la demo
+
+La demo utiliza exactamente tres eventos independientes.
+Una carta especial puede activar un evento, pero la carta y el evento
+se consideran definiciones diferentes.
+
+Cada evento debe declarar:
+ID
+Nombre
+Oportunidad de activación
+Probabilidad base
+Modificador por presión
+Fases válidas
+Puede rechazarse
+Coste del rechazo
+Consecuencia del rechazo
+Efecto
+Duración
+Consumo de acción, mano o ronda
+Límite de activaciones
+
+
+ID
+Evento
+Se comprueba
+Probabilidad
+Rechazable
+Coste
+Efecto
+Consume
+EV-01
+Por definir
+Por definir
+—
+Sí/No
+—
+—
+—
+EV-02
+Por definir
+Por definir
+—
+Sí/No
+—
+—
+—
+EV-03
+Por definir
+Por definir
+—
+Sí/No
+—
+—
+—
+
+
+
+16. Cancelación y rechazo
+Cancelar una selección
+Mientras el jugador todavía no confirmó el uso de un objeto, puede cancelar sin perderlo.
+Confirmar un objeto
+Después de confirmar:
+se consume el uso;
+se paga el coste;
+el efecto no puede cancelarse.
+Rechazar una carta positiva
+Si el jugador rechaza una carta positiva:
+la carta se retira de la ronda;
+no vuelve al mazo actual;
+su probabilidad de aparición puede reducirse temporalmente.
+Evitar un evento
+Algunos eventos pueden evitarse pagando al Dealer.
+Ese pago:
+no reduce la deuda;
+se entrega directamente al Dealer;
+puede aumentar dependencia o codicia.
+No todos los eventos pueden rechazarse.
+Cada evento deberá indicar:
+Puede rechazarse: sí/no
+Coste del rechazo
+Consecuencia del rechazo
+
+
+17. Consumo de acciones
+Debe diferenciarse entre consumir una acción, una mano o una ronda.
+Consumir acción
+El objeto o carta utiliza la acción actual, pero la mano continúa.
+Consumir mano
+La mano termina inmediatamente y se aplica el resultado indicado.
+La ronda continúa con la siguiente mano.
+Consumir ronda
+La ronda termina inmediatamente.
+Se pierden las manos restantes y se aplican los intereses correspondientes.
+
+17.1. Evento raro que consume una ronda
+Puede existir una carta o evento extremadamente raro con una probabilidad base aproximada del 3,2 %.
+Al activarse:
+termina la ronda actual;
+se pierden las manos restantes;
+se aplican los intereses;
+no se añade un aumento adicional separado a la deuda.
+Los intereses representan la penalización económica por haber perdido esa ronda.
+
+17.2. Objeto para evitar los intereses
+Puede existir un objeto que permita terminar anticipadamente la ronda sin generar intereses.
+Como penalización:
+el jugador no puede utilizar objetos durante las dos siguientes manos;
+el objeto se consume;
+la ronda se considera utilizada.
+Esto crea una elección entre evitar el aumento de la deuda o conservar el acceso a los objetos.
+
+18. Acumulación y contradicción de efectos
+Los efectos instantáneos pueden utilizarse varias veces.
+Ejemplos:
+reducir presión;
+robar una carta;
+pagar deuda;
+revelar información.
+Los efectos temporales se dividen en categorías.
+Ejemplos de categorías:
+protección de apuesta;
+modificación de recompensa;
+modificación del objetivo;
+bloqueo de objetos;
+información de cartas;
+modificación del Dealer.
+Misma categoría
+Dos efectos temporales de la misma categoría no se acumulan.
+El efecto más reciente reemplaza al anterior.
+Ejemplo:
+Protección actual: 20 monedas
+Nueva protección: 30 monedas
+
+La protección de 30 reemplaza a la de 20.
+
+Categorías diferentes
+Los efectos pueden coexistir.
+Ejemplo:
+Protección de apuesta
++ revelación de carta
++ reducción de presión
+
+Orden de resolución
+Los efectos se procesan en el siguiente orden:
+Se comprueba si la acción es válida.
+Se paga el coste.
+Se consumen los usos necesarios.
+Se ejecutan protecciones automáticas.
+Se aplica el nuevo efecto.
+Se resuelven conflictos con efectos anteriores.
+Se recalculan valores y recursos.
+Se comprueba el resultado de la mano.
+Se eliminan los efectos vencidos.
+
+19. Configuración inicial resumida
+Dinero inicial: 50 monedas
+
+Deuda inicial: 200 monedas
+
+Rondas por ciclo: 4
+
+Manos por ronda: 5
+
+Interés por ronda: 15 %
+
+Apuesta mínima: 5 monedas
+
+Apuesta máxima:
+Ronda 1: 20
+Ronda 2: 25
+Ronda 3: 30
+Ronda 4: 35
+
+Victoria normal:
+92 % de ganancia neta
+
+23 con tres cartas:
+120 % de ganancia neta
+
+Victoria all-in:
+110 % de ganancia neta
+
+23 inicial con all-in:
+150 % de ganancia neta
+
+Mazo numérico:
+52 cartas
+
+Cartas especiales:
+5 cartas únicas
+
+Presión:
+0 a 100
+
+Objetos en la mesa:
+4
+
+Objetos almacenados:
+2
+
+Usos iniciales de las pastillas:
+3
+
+Reducción de presión por pastilla:
+30 puntos
+
+Límite del Dealer:
+Se planta con 17 o más
+
+Estas reglas representan el punto de partida para la demo. Los porcentajes económicos, la cantidad de manos, la generación de presión y el comportamiento del Dealer deberán mantenerse configurables para poder ajustarlos después de las pruebas.
+
+
