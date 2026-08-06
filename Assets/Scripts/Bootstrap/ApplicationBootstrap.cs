@@ -7,10 +7,6 @@ using UnityEngine.SceneManagement;
 
 namespace TwentyThree.Bootstrap
 {
-    /// <summary>
-    /// Persistent composition root. It owns the process-wide services but does not expose
-    /// a global Instance; scene objects receive their dependencies through contracts.
-    /// </summary>
     [DefaultExecutionOrder(-1000)]
     public sealed class ApplicationBootstrap : MonoBehaviour
     {

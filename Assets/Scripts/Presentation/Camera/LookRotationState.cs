@@ -15,10 +15,6 @@ namespace TwentyThree.Presentation.Camera
         public float Pitch { get; }
     }
 
-    /// <summary>
-    /// Stateful, deterministic look calculation. It retains pitch only; yaw is always a
-    /// delta produced by the current input sample, which prevents residual rotation.
-    /// </summary>
     public sealed class LookRotationState
     {
         private readonly float _minimumPitch;

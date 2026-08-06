@@ -190,13 +190,22 @@ namespace TwentyThree.Tests.EditMode.Foundation
         }
 
         [Test]
-        public void LegacyProjectAssetsWereRemovedAndGameRoomHasNoLegacySceneDependencies()
+        public void ProjectUsesTheOrganizedAssetLayoutWithoutLegacyDependencies()
         {
             Assert.That(AssetDatabase.IsValidFolder("Assets/Scrip"), Is.False);
-            Assert.That(AssetDatabase.IsValidFolder("Assets/Scenes"), Is.False);
-            Assert.That(AssetDatabase.IsValidFolder("Assets/Prefabs"), Is.False);
+            Assert.That(AssetDatabase.IsValidFolder("Assets/_Project"), Is.False);
+            Assert.That(AssetDatabase.IsValidFolder("Assets/Scripts"), Is.True);
+            Assert.That(AssetDatabase.IsValidFolder("Assets/Scenes"), Is.True);
+            Assert.That(AssetDatabase.IsValidFolder("Assets/Prefabs"), Is.True);
+            Assert.That(AssetDatabase.IsValidFolder("Assets/GameContent"), Is.True);
             Assert.That(
                 AssetDatabase.LoadAssetAtPath<Object>("Assets/InputSystem_Actions.inputactions"),
+                Is.Null);
+            Assert.That(
+                AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/EscenarioPrincipal.unity"),
+                Is.Null);
+            Assert.That(
+                AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/SampleScene.unity"),
                 Is.Null);
 
             string[] dependencies = AssetDatabase.GetDependencies(
@@ -204,15 +213,15 @@ namespace TwentyThree.Tests.EditMode.Foundation
                 true);
             Assert.That(
                 dependencies.Any(path => path.StartsWith(
-                    "Assets/Scenes/",
+                    "Assets/_Project/",
                     StringComparison.OrdinalIgnoreCase)),
                 Is.False);
             Assert.That(
                 dependencies,
-                Does.Contain("Assets/_Project/Content/Environment/Global Volume Profile.asset"));
+                Does.Contain("Assets/GameContent/Environment/Global Volume Profile.asset"));
             Assert.That(
                 dependencies,
-                Does.Contain("Assets/_Project/Content/Environment/PixelRenderTexture.renderTexture"));
+                Does.Contain("Assets/GameContent/Environment/PixelRenderTexture.renderTexture"));
         }
 
         private static int CountMissingScripts(Scene scene)

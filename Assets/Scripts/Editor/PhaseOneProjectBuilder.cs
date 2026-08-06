@@ -23,15 +23,15 @@ namespace TwentyThree.Editor
 {
     public static class PhaseOneProjectBuilder
     {
-        public const string InputActionsPath = "Assets/_Project/Content/Input/TwentyThreeInput.inputactions";
-        public const string SceneConfigurationPath = "Assets/_Project/Content/Configuration/SceneFlowConfiguration.asset";
-        public const string PlayerPrefabPath = "Assets/_Project/Prefabs/PlayerRig.prefab";
-        public const string BootstrapScenePath = "Assets/_Project/Scenes/00_Bootstrap.unity";
-        public const string MainMenuScenePath = "Assets/_Project/Scenes/01_MainMenu.unity";
-        public const string GameRoomScenePath = "Assets/_Project/Scenes/10_GameRoom.unity";
+        public const string InputActionsPath = "Assets/GameContent/Input/TwentyThreeInput.inputactions";
+        public const string SceneConfigurationPath = "Assets/GameContent/Configuration/SceneFlowConfiguration.asset";
+        public const string PlayerPrefabPath = "Assets/Prefabs/PlayerRig.prefab";
+        public const string BootstrapScenePath = "Assets/Scenes/00_Bootstrap.unity";
+        public const string MainMenuScenePath = "Assets/Scenes/01_MainMenu.unity";
+        public const string GameRoomScenePath = "Assets/Scenes/10_GameRoom.unity";
 
         private const string PixelRenderTexturePath =
-            "Assets/_Project/Content/Environment/PixelRenderTexture.renderTexture";
+            "Assets/GameContent/Environment/PixelRenderTexture.renderTexture";
         private const string InteractableLayerName = "Interactable";
         private const string SeatPrompt = "Interactuar — Sentarse en la mesa";
         private const float PlayerHeight = 2.7f;
@@ -82,9 +82,9 @@ namespace TwentyThree.Editor
 
         private static void BuildFoundation()
         {
-            EnsureFolder("Assets/_Project/Content/Configuration");
-            EnsureFolder("Assets/_Project/Prefabs");
-            EnsureFolder("Assets/_Project/Scenes");
+            EnsureFolder("Assets/GameContent/Configuration");
+            EnsureFolder("Assets/Prefabs");
+            EnsureFolder("Assets/Scenes");
 
             AssetDatabase.ImportAsset(InputActionsPath, ImportAssetOptions.ForceSynchronousImport);
             InputActionAsset inputActions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath);
@@ -266,9 +266,6 @@ namespace TwentyThree.Editor
 
         private static void CreateBootstrapScene(SceneFlowConfiguration sceneConfiguration)
         {
-            // Asset imports performed while creating the player prefab can invalidate the
-            // managed wrapper returned by CreateAsset. Reload the persistent object immediately
-            // before serialization so the scene never receives a fake-null reference.
             sceneConfiguration = AssetDatabase.LoadAssetAtPath<SceneFlowConfiguration>(
                 SceneConfigurationPath);
             if (sceneConfiguration == null)
