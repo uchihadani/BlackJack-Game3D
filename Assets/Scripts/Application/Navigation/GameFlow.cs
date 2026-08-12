@@ -1,4 +1,5 @@
 using System;
+using TwentyThree.Application.Gameplay;
 
 namespace TwentyThree.Application.Navigation
 {
@@ -7,15 +8,18 @@ namespace TwentyThree.Application.Navigation
         private readonly SceneCatalog _sceneCatalog;
         private readonly ISceneLoader _sceneLoader;
         private readonly IApplicationLifecycle _applicationLifecycle;
+        private readonly IRunSessionController _runSessionController;
 
         public GameFlow(
             SceneCatalog sceneCatalog,
             ISceneLoader sceneLoader,
-            IApplicationLifecycle applicationLifecycle)
+            IApplicationLifecycle applicationLifecycle,
+            IRunSessionController runSessionController)
         {
             _sceneCatalog = sceneCatalog ?? throw new ArgumentNullException(nameof(sceneCatalog));
             _sceneLoader = sceneLoader ?? throw new ArgumentNullException(nameof(sceneLoader));
             _applicationLifecycle = applicationLifecycle ?? throw new ArgumentNullException(nameof(applicationLifecycle));
+            _runSessionController = runSessionController ?? throw new ArgumentNullException(nameof(runSessionController));
         }
 
         public bool IsTransitioning => _sceneLoader.IsLoading;
@@ -27,7 +31,13 @@ namespace TwentyThree.Application.Navigation
 
         public bool StartNewRun()
         {
-            return Load(SceneId.GameRoom);
+            if (!Load(SceneId.GameRoom))
+            {
+                return false;
+            }
+
+            _runSessionController.StartNewRun();
+            return true;
         }
 
         public void Quit()

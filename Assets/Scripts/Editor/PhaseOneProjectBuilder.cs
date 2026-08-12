@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using TMPro;
 using TwentyThree.Bootstrap;
+using TwentyThree.Infrastructure.Configuration;
 using TwentyThree.Infrastructure.Scenes;
 using TwentyThree.Presentation.Camera;
 using TwentyThree.Presentation.Input;
@@ -100,9 +101,10 @@ namespace TwentyThree.Editor
 
             int interactableLayer = EnsureLayer(InteractableLayerName);
             SceneFlowConfiguration sceneConfiguration = GetOrCreateSceneConfiguration();
+            GameRulesConfiguration gameRulesConfiguration = GetOrCreateGameRulesConfiguration();
             GameObject playerPrefab = CreatePlayerPrefab(inputActions, interactableLayer);
 
-            CreateBootstrapScene(sceneConfiguration);
+            CreateBootstrapScene(sceneConfiguration, gameRulesConfiguration);
             CreateMainMenuScene(inputActions);
             CreateGameRoomScene(inputActions, playerPrefab, interactableLayer);
             ConfigureBuildSettings();
@@ -122,6 +124,25 @@ namespace TwentyThree.Editor
 
             configuration = ScriptableObject.CreateInstance<SceneFlowConfiguration>();
             AssetDatabase.CreateAsset(configuration, SceneConfigurationPath);
+            return configuration;
+        }
+
+        private static GameRulesConfiguration GetOrCreateGameRulesConfiguration()
+        {
+            GameRulesConfiguration configuration =
+                AssetDatabase.LoadAssetAtPath<GameRulesConfiguration>(
+                    PhaseTwoConfigurationBuilder.GameRulesConfigurationPath);
+            if (configuration != null)
+            {
+                configuration.CreateRules();
+                return configuration;
+            }
+
+            configuration = ScriptableObject.CreateInstance<GameRulesConfiguration>();
+            configuration.CreateRules();
+            AssetDatabase.CreateAsset(
+                configuration,
+                PhaseTwoConfigurationBuilder.GameRulesConfigurationPath);
             return configuration;
         }
 
@@ -264,7 +285,9 @@ namespace TwentyThree.Editor
             }
         }
 
-        private static void CreateBootstrapScene(SceneFlowConfiguration sceneConfiguration)
+        private static void CreateBootstrapScene(
+            SceneFlowConfiguration sceneConfiguration,
+            GameRulesConfiguration gameRulesConfiguration)
         {
             sceneConfiguration = AssetDatabase.LoadAssetAtPath<SceneFlowConfiguration>(
                 SceneConfigurationPath);
@@ -272,6 +295,15 @@ namespace TwentyThree.Editor
             {
                 throw new InvalidOperationException("SceneFlowConfiguration could not be reloaded.");
             }
+
+            gameRulesConfiguration = AssetDatabase.LoadAssetAtPath<GameRulesConfiguration>(
+                PhaseTwoConfigurationBuilder.GameRulesConfigurationPath);
+            if (gameRulesConfiguration == null)
+            {
+                throw new InvalidOperationException("GameRulesConfiguration could not be reloaded.");
+            }
+
+            gameRulesConfiguration.CreateRules();
 
             Scene scene;
             ApplicationBootstrap bootstrap;
@@ -293,6 +325,7 @@ namespace TwentyThree.Editor
             }
 
             bootstrap.SetSceneFlowConfiguration(sceneConfiguration);
+            bootstrap.SetGameRulesConfiguration(gameRulesConfiguration);
             EditorUtility.SetDirty(bootstrap);
             EditorSceneManager.MarkSceneDirty(scene);
             SaveScene(scene, BootstrapScenePath);

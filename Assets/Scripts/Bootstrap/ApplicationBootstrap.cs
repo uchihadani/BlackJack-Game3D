@@ -1,5 +1,9 @@
+using System;
+using TwentyThree.Application.Gameplay;
 using TwentyThree.Application.Navigation;
 using TwentyThree.Application.Settings;
+using TwentyThree.Infrastructure.Configuration;
+using TwentyThree.Infrastructure.Random;
 using TwentyThree.Infrastructure.Scenes;
 using TwentyThree.Infrastructure.Settings;
 using UnityEngine;
@@ -11,14 +15,23 @@ namespace TwentyThree.Bootstrap
     public sealed class ApplicationBootstrap : MonoBehaviour
     {
         [SerializeField] private SceneFlowConfiguration sceneFlowConfiguration;
+        [SerializeField] private GameRulesConfiguration gameRulesConfiguration;
 
         private static ApplicationBootstrap activeBootstrap;
         private IGameFlow _gameFlow;
         private IPlayerPreferences _playerPreferences;
+        private IRunSessionController _runSessionController;
+
+        public IRunSessionController RunSessionController => _runSessionController;
 
         public void SetSceneFlowConfiguration(SceneFlowConfiguration configuration)
         {
             sceneFlowConfiguration = configuration;
+        }
+
+        public void SetGameRulesConfiguration(GameRulesConfiguration configuration)
+        {
+            gameRulesConfiguration = configuration;
         }
 
         private void Awake()
@@ -29,9 +42,11 @@ namespace TwentyThree.Bootstrap
                 return;
             }
 
-            if (sceneFlowConfiguration == null)
+            if (sceneFlowConfiguration == null || gameRulesConfiguration == null)
             {
-                Debug.LogError("ApplicationBootstrap requires a SceneFlowConfiguration.", this);
+                Debug.LogError(
+                    "ApplicationBootstrap requires scene flow and game rules configurations.",
+                    this);
                 enabled = false;
                 return;
             }
@@ -39,11 +54,27 @@ namespace TwentyThree.Bootstrap
             activeBootstrap = this;
             DontDestroyOnLoad(gameObject);
 
-            _gameFlow = new GameFlow(
-                sceneFlowConfiguration.CreateCatalog(),
-                new UnitySceneLoader(),
-                new UnityApplicationLifecycle());
-            _playerPreferences = new PlayerPreferences();
+            try
+            {
+                GameSessionFactory sessionFactory = new GameSessionFactory(
+                    gameRulesConfiguration.CreateRules(),
+                    new DeterministicCardShuffler());
+                _runSessionController = new RunSessionController(
+                    sessionFactory,
+                    new SystemRunSeedProvider());
+                _gameFlow = new GameFlow(
+                    sceneFlowConfiguration.CreateCatalog(),
+                    new UnitySceneLoader(),
+                    new UnityApplicationLifecycle(),
+                    _runSessionController);
+                _playerPreferences = new PlayerPreferences();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception, this);
+                enabled = false;
+                return;
+            }
 
             SceneManager.sceneLoaded += OnSceneLoaded;
             InjectInto(SceneManager.GetActiveScene());
@@ -89,7 +120,10 @@ namespace TwentyThree.Bootstrap
 
         private void InjectInto(Scene scene)
         {
-            if (_gameFlow == null || _playerPreferences == null || !scene.IsValid())
+            if (_gameFlow == null ||
+                _playerPreferences == null ||
+                _runSessionController == null ||
+                !scene.IsValid())
             {
                 return;
             }
@@ -107,6 +141,11 @@ namespace TwentyThree.Bootstrap
                     if (behaviour is IPlayerPreferencesConsumer preferencesConsumer)
                     {
                         preferencesConsumer.Configure(_playerPreferences);
+                    }
+
+                    if (behaviour is IRunSessionConsumer runSessionConsumer)
+                    {
+                        runSessionConsumer.Configure(_runSessionController);
                     }
                 }
             }

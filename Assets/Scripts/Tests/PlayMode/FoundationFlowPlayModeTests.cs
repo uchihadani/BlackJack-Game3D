@@ -1,6 +1,7 @@
 using System.Collections;
 using NUnit.Framework;
 using TwentyThree.Bootstrap;
+using TwentyThree.Domain.Economy;
 using TwentyThree.Presentation.Camera;
 using TwentyThree.Presentation.Input;
 using TwentyThree.Presentation.Movement;
@@ -65,6 +66,12 @@ namespace TwentyThree.Tests.PlayMode
 
             Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo("10_GameRoom"));
             Assert.That(Object.FindObjectsByType<UnityEngine.Camera>(FindObjectsInactive.Include), Has.Length.EqualTo(1));
+            ApplicationBootstrap bootstrap = Object.FindAnyObjectByType<ApplicationBootstrap>(FindObjectsInactive.Include);
+            Assert.That(bootstrap.RunSessionController.Current, Is.Not.Null);
+            Assert.That(bootstrap.RunSessionController.Current.AvailableMoney, Is.EqualTo(Money.FromCoins(50)));
+            Assert.That(bootstrap.RunSessionController.Current.RemainingDebt, Is.EqualTo(Money.FromCoins(200)));
+            Assert.That(bootstrap.RunSessionController.Current.CurrentCycleNumber, Is.EqualTo(1));
+            Assert.That(bootstrap.RunSessionController.Current.CurrentRoundNumber, Is.EqualTo(1));
         }
 
         [UnityTest]

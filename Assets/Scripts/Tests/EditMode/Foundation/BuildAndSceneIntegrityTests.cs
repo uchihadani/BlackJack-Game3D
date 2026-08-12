@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using TwentyThree.Bootstrap;
 using TwentyThree.Editor;
+using TwentyThree.Infrastructure.Configuration;
 using TwentyThree.Presentation.Input;
 using TwentyThree.Presentation.Interaction;
 using TwentyThree.Presentation.Player;
@@ -85,7 +86,13 @@ namespace TwentyThree.Tests.EditMode.Foundation
                 Scene bootstrapScene = EditorSceneManager.OpenScene(
                     PhaseOneProjectBuilder.BootstrapScenePath,
                     OpenSceneMode.Single);
-                Assert.That(FindComponents<ApplicationBootstrap>(bootstrapScene), Has.Count.EqualTo(1));
+                ApplicationBootstrap bootstrap = FindComponents<ApplicationBootstrap>(bootstrapScene).Single();
+                SerializedProperty rulesConfiguration =
+                    new SerializedObject(bootstrap).FindProperty("gameRulesConfiguration");
+                Assert.That(rulesConfiguration.objectReferenceValue, Is.TypeOf<GameRulesConfiguration>());
+                Assert.That(
+                    AssetDatabase.GetAssetPath(rulesConfiguration.objectReferenceValue),
+                    Is.EqualTo(PhaseTwoConfigurationBuilder.GameRulesConfigurationPath));
 
                 Scene menuScene = EditorSceneManager.OpenScene(
                     PhaseOneProjectBuilder.MainMenuScenePath,

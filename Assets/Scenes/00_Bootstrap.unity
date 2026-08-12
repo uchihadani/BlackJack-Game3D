@@ -149,6 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: TwentyThree.Bootstrap::TwentyThree.Bootstrap.ApplicationBootstrap
   sceneFlowConfiguration: {fileID: 11400000, guid: ed4b985f9889f304e8897dbd6e9889ef, type: 2}
+  gameRulesConfiguration: {fileID: 11400000, guid: dfc0b2bc904143a4a4b3c995c71656f6, type: 2}
 --- !u!4 &1306214432
 Transform:
   m_ObjectHideFlags: 0

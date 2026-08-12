@@ -2,6 +2,7 @@
   "name": "TwentyThree.Bootstrap",
   "rootNamespace": "TwentyThree.Bootstrap",
   "references": [
+    "TwentyThree.Domain",
     "TwentyThree.Application",
     "TwentyThree.Infrastructure",
     "TwentyThree.Presentation"
