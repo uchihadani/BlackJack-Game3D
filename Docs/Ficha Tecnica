@@ -1,23 +1,18 @@
 Especificación de reglas para el prototipo
-Versión: 1.0
-Fecha de revisión: 5 de agosto de 2026
-Estado: base técnica aprobada; Gate A de contenido abierto
+Versión: 1.1
+Fecha de revisión: 14 de agosto de 2026
+Estado: Gate A aprobado para implementar la Fase 3
 
 Autoridad documental
 Para programación, esta ficha técnica prevalece sobre el GDD cuando exista una diferencia de precisión o alcance.
-El GDD define la visión, la experiencia y las posibilidades futuras; esta ficha define el contrato implementable de la demo.
+El GDD define la visión, la experiencia y las posibilidades futuras. Esta ficha define el contrato implementable de la demo.
+El Roadmap define el orden de trabajo y los límites de cada fase.
 
-Pendientes que no bloquean las Fases 1 y 2
-Diseño de contenido debe aprobar, antes de comenzar la Fase 3:
-cinco objetos de la demo;
-cinco cartas especiales de la demo;
-tres eventos independientes de la demo;
-la especificación definitiva de Presión y sus interacciones.
-Responsable funcional: Diseño de contenido; asignación nominal pendiente por parte del equipo.
-Fecha límite de desarrollo: Gate A, antes de iniciar la Fase 3.
-Todo valor o ejemplo dentro de esos bloques se considera propuesta no vinculante hasta su aprobación explícita.
-
-Los siguientes valores representan la configuración inicial de la versión demo. Deberán poder modificarse desde Unity mediante archivos de configuración o ScriptableObjects, ya que el balance definitivo dependerá de las pruebas con jugadores.
+Alcance de la configuración
+Los valores de balance representan la configuración inicial de la demo y deberán poder modificarse desde Unity mediante archivos de configuración o Scriptable Objects.
+Los valores configurables pueden ajustarse sin cambiar las reglas semánticas descritas en esta ficha.
+Cambiar qué activa un efecto, qué objetivo admite, cuándo se consume o cómo se resuelve un caso borde requiere modificar esta ficha y aumentar su versión.
+Las palabras narrativas no sustituyen una regla mecánica. Cuando un efecto sea solamente audiovisual se indicará expresamente.
 
 1. Terminología de la partida
 Para evitar confusiones entre jugadas, rondas y partidas, se utilizarán los siguientes términos:
@@ -42,17 +37,15 @@ abandonar la ronda anticipadamente.
 Si abandona la ronda, conserva el dinero que no haya apostado, pero pierde las manos restantes y consume igualmente esa ronda.
 Al terminar o abandonar una ronda se generan los intereses correspondientes.
 Ciclo de deuda
-Un ciclo de deuda está formado por un máximo de cuatro rondas.
+Un ciclo de deuda está formado por cuatro rondas ordinarias.
+IT-03 Segunda Oportunidad puede agregar una única quinta ronda extraordinaria sin convertirla en una ronda ordinaria ni cambiar el índice de reglas de la cuarta.
 Durante ese tiempo, el jugador debe pagar por completo la deuda actual.
 Si paga la deuda antes de terminar las cuatro rondas, supera ese nivel y comienza un nuevo ciclo con una deuda mayor.
-Si termina la cuarta ronda sin haber pagado la deuda, se evalúa una derrota o un final negativo según sus valores de esperanza, lucidez y relación con el Dealer.
+Si termina la cuarta ronda sin haber pagado la deuda, la demo entra en el estado mecánico DebtDeadlineMissed.
+La presentación narrativa posterior puede reaccionar a los recursos psicológicos, pero no cambia este resultado mecánico en la demo.
 Partida o run
-La partida completa comienza cuando el protagonista despierta en la habitación y termina cuando:
-alcanza uno de los finales;
-pierde toda esperanza;
-queda atrapado por la deuda;
-acepta un pacto definitivo;
-encuentra una forma de escapar.
+La run de la demo comienza cuando el protagonista despierta en la habitación y termina mecánicamente en DemoCompleted o DebtDeadlineMissed.
+Los finales por Esperanza, pactos definitivos o formas alternativas de escape pertenecen al juego completo y no se calculan en esta demo.
 Una misma run puede contener varios ciclos de deuda.
 
 2. Sistema de cartas
@@ -89,27 +82,41 @@ Un As vale 11 y el otro vale 1.
 
 
 2.2. Cartas especiales
-La demo contará inicialmente con cinco cartas especiales.
-Estas cinco cartas pueden pertenecer a las siguientes categorías:
-positivas;
-negativas;
-de evento;
-malditas.
-Existirá una sola copia de cada carta especial.
-Por lo tanto, el conjunto total utilizado durante la demo será:
-52 cartas numéricas
-+ 5 cartas especiales
-= 57 cartas
+La demo utiliza exactamente las cinco cartas especiales SC-01 a SC-05 definidas en la sección 14.
+Existe una sola copia de cada una por ronda.
+El mazo de cada ronda contiene 52 cartas numéricas y 5 cartas especiales, para un total de 57 cartas.
 
-Las cartas especiales no aportan un valor numérico a la mano.
-Cuando aparece una:
-Se revela durante unos segundos.
-Se muestra su descripción.
-Se ejecuta o se ofrece su efecto.
-Se retira de la ronda.
-Se roba una carta numérica de reemplazo cuando corresponda.
-Esto evita que una carta de evento ocupe el lugar de una carta necesaria para calcular el valor de la mano.
-Una carta especial retirada no puede volver a aparecer durante esa misma ronda.
+Categoría y activación son conceptos diferentes.
+Categorías válidas:
+positiva;
+negativa;
+de evento;
+maldita.
+
+Tipos de activación válidos:
+obligatoria;
+elección opcional;
+oferta del Dealer.
+
+Elección opcional significa que el jugador puede aceptar gratuitamente el efecto o pagar el coste completo declarado para rechazarlo.
+Una elección interna posterior, como escoger A o B en SC-04, forma parte de la resolución del efecto aceptado y no crea un cuarto tipo de activación.
+
+Las cartas especiales no aportan valor numérico a ninguna mano.
+Pueden aparecer en cualquier extracción del mazo: reparto inicial, robo del jugador, robo del Dealer o reemplazo provocado por otro efecto.
+
+Flujo normativo al extraer una carta especial:
+se pausa el reparto normal;
+se registra la carta, el receptor original y el índice de extracción;
+se muestra su información permitida por el nivel actual de Presión;
+se ejecuta su efecto o se presenta su decisión;
+se retira la carta durante el resto de la ronda;
+se roba una carta numérica de reemplazo para el mismo receptor y con la misma visibilidad prevista por la extracción original;
+se reanuda el flujo que estaba pausado.
+
+Si aparece otra carta especial antes de obtener el reemplazo numérico, se resuelve con el mismo procedimiento. Las especiales consecutivas se resuelven de una en una y en su orden de extracción.
+Una especial retirada no regresa al mazo por rebarajados normales ni por el rebarajado de emergencia.
+La única excepción al reemplazo ordinario es SC-04 Tercer ojo, que define su propia selección de reemplazo numérico.
+Las cartas especiales no se guardan en la mano ni en el inventario y el jugador no puede activarlas más tarde.
 
 2.3. Reinicio del mazo
 El mazo se crea y se baraja al comienzo de cada ronda.
@@ -117,11 +124,13 @@ No se reinicia entre las distintas manos de esa ronda.
 Esto permite que:
 las cartas utilizadas dejen de estar disponibles;
 el jugador recuerde cuáles aparecieron;
-determinados objetos calculen probabilidades aproximadas;
 las cartas especiales no se repitan;
 exista una dimensión estratégica relacionada con las cartas restantes.
-Cuando comienza una nueva ronda, las 52 cartas numéricas y las cartas especiales disponibles regresan al mazo y se vuelve a barajar.
+Cuando comienza una nueva ronda, las 52 cartas numéricas y las cinco cartas especiales regresan al mazo y se vuelve a barajar, aunque una especial persistente como SC-05 vaya a resolverse como no-op.
 La semilla utilizada para barajar debe almacenarse para poder reproducir partidas durante las pruebas y para permitir futuros desafíos diarios.
+La construcción parte de un orden canónico de las 52 numéricas seguido por SC-01, SC-02, SC-03, SC-04 y SC-05, y baraja las 57 entradas juntas mediante Fisher-Yates determinista.
+El barajado inicial utiliza la seed registrada de esa instancia de ronda y el streamIndex 0 del stream ROUND_DECK.
+Cada recuperación de descartes de la misma ronda utiliza el siguiente streamIndex positivo de ROUND_DECK y registra ese índice; no vuelve a barajar las especiales que permanecen en la pila.
 2.4. Agotamiento del mazo
 
 Antes de comenzar una nueva mano se comprueba la cantidad de cartas numéricas restantes.
@@ -139,10 +148,14 @@ no se incluyen las cartas de la mano actual;
 no regresan las cartas especiales retiradas;
 las cartas recuperadas se barajan utilizando un stream RNG de emergencia
 derivado de la seed de la ronda;
+las cartas especiales que todavía permanecían sin robar conservan su orden relativo y permanecen delante de las numéricas recuperadas;
+las numéricas recuperadas se anexan al final de la pila existente;
 se registra el rebarajado en el historial de la run;
 la mano continúa normalmente.
 
 Si no existen cartas numéricas disponibles ni descartes reutilizables:
+se resuelven en orden las cartas especiales que aún estuvieran delante del robo pendiente;
+si después de retirarlas sigue sin existir un reemplazo numérico, no se inventa ninguna carta;
 la mano termina en empate técnico;
 la apuesta se devuelve;
 la ronda finaliza.
@@ -159,19 +172,28 @@ pueden activarse objetos o efectos correspondientes a la fase previa al reparto.
 
 3.2. Reparto inicial
 Al comenzar una mano, se reparten seis cartas numéricas:
-Jugador
-Tres cartas visibles.
-Dealer
-Dos cartas visibles.
-Una carta oculta.
-Las cartas especiales que aparezcan durante el reparto se resuelven y son reemplazadas por cartas numéricas.
+P1: primera carta visible del jugador.
+D1: primera carta visible del Dealer.
+P2: segunda carta visible del jugador.
+D2: segunda carta visible del Dealer.
+P3: tercera carta visible del jugador, salvo un ocultamiento explícito.
+D3: tercera carta del Dealer, boca abajo.
+
+Cada espacio se completa con una carta numérica antes de avanzar al siguiente.
+Las especiales que aparezcan durante una extracción se resuelven y se reemplazan según 2.2.
+Después de completar D2 se encuentra el checkpoint de EV-02.
+Después de asignar P3 y antes de presentar su cara se encuentra el checkpoint de EV-03.
+
+No se comprueba 23 ni exceso a mitad del reparto inicial.
+Después de completar D3 se resuelven modificadores y las protecciones automáticas IT-05 e IT-02, y recién entonces se evalúa el resultado inicial del jugador.
+Si el jugador gana, pierde o queda en Empate protegido, la mano pasa a Resolution y no se comprueba EV-01 ni se abre PlayerTurn.
+Si la mano continúa, se comprueba EV-01 y después comienza PlayerTurn.
 
 3.3. Turno del jugador
 Después del reparto inicial, el jugador puede:
 pedir otra carta;
 plantarse;
 utilizar un objeto permitido;
-activar una carta especial;
 aceptar o rechazar una propuesta del Dealer.
 Cada carta adicional aumenta la presión.
 Si el jugador supera el valor de 23, pierde inmediatamente la mano y el Dealer no necesita completar su turno.
@@ -184,16 +206,16 @@ El Dealer pide cartas mientras tenga menos de 17.
 Se planta cuando alcanza 17 o más.
 Si supera 23, pierde automáticamente.
 Durante la demo, el límite fijo del Dealer será 17.
-Este valor deberá ser configurable, ya que posteriormente podrán existir variantes:
-Dealer conservador: se planta en 17.
-Dealer equilibrado: se planta en 19.
-Dealer agresivo: se planta en 21.
-Dealer alterado: cambia su límite según la presión o los eventos.
+Este valor se conserva configurable para balance, pero ningún objeto, carta, evento, recurso psicológico o ciclo aprobado lo modifica durante la demo.
 
 4. Resolución de la mano
 Los resultados se resuelven en el siguiente orden:
 Jugador supera 23
 El jugador pierde inmediatamente toda la cantidad apostada.
+Jugador alcanza exactamente 23
+El jugador gana inmediatamente antes de comparar su total con el Dealer.
+Si ocurrió con las tres cartas iniciales utiliza la recompensa de 23 inicial; si ocurrió con una cuarta carta o posterior utiliza la recompensa normal.
+El Dealer no revela ni completa su turno y un 23 del Dealer no convierte este resultado en empate.
 Dealer supera 23
 El jugador gana la mano.
 Ambos poseen el mismo valor válido
@@ -210,7 +232,6 @@ Existen dos tipos de resultado con valor 23.
 23 inicial
 Se obtiene cuando el jugador alcanza exactamente 23 con las tres cartas iniciales.
 Este resultado ofrece una recompensa especial.
-La probabilidad aproximada de que ocurra con un mazo estándar se encuentra alrededor del 8 %, por lo que funciona como un resultado poco frecuente, pero alcanzable.
 23 durante el turno
 Se obtiene cuando el jugador llega a 23 después de pedir una cuarta carta o más.
 El jugador gana la mano, pero recibe la recompensa normal.
@@ -251,6 +272,11 @@ El jugador nunca puede apostar más dinero del que posee.
 5.4. All-in
 El jugador puede seleccionar una apuesta total o all-in.
 El all-in permite apostar todo el dinero disponible, aunque la cantidad supere el máximo normal de la ronda.
+El all-in no evita la apuesta mínima: solamente es válido cuando el dinero disponible es igual o superior a la apuesta mínima.
+Si una ronda nueva debe comenzar y el dinero disponible es inferior a la apuesta mínima, no se bloquea dinero ni comienza una mano. La sesión entra en FundingRequired, donde la ventana de Preparación permite retirar dinero protegido o abandonar la ronda.
+Si el jugador elige continuar desde PostHand sin fondos suficientes, el comando se rechaza sin mutar el estado y permanece en PostHand, donde todavía puede retirar dinero protegido o abandonar.
+Después de cada compra, depósito o retiro confirmado en Betting o FundingRequired se reevalúa el dinero disponible: con al menos la apuesta mínima la fase queda en Betting; con menos, queda en FundingRequired.
+Esta reevaluación no se realiza en PostHand ni RoundSettlement hasta que el jugador ordena continuar o cerrar la ronda.
 A cambio del riesgo, aplica un multiplicador superior.
 Valores iniciales para la demo:
 Resultado
@@ -318,6 +344,19 @@ Fracción igual o superior a 0,5: se redondea hacia arriba.
 El redondeo se realiza una sola vez, al finalizar cada operación porcentual.
 Nunca se almacenan fracciones menores a una unidad interna.
 
+5.7. Convención global de RNG
+Toda comprobación porcentual de la demo utiliza un umbral entero expresado en puntos base y obtiene exactamente un entero uniforme entre 0 y 9.999.
+La comprobación tiene éxito si y sólo si el roll es menor que el umbral.
+Por lo tanto, un umbral 0 nunca tiene éxito y un umbral 10.000 siempre tiene éxito.
+
+Toda selección uniforme sobre un conjunto finito construye primero la lista ordenada de candidatos válidos y obtiene un índice uniforme entre 0 inclusive y la cantidad de candidatos exclusive.
+No se repiten tiradas para descartar un valor inválido, porque eso alteraría de forma variable la posición del stream.
+
+Cada sistema utiliza el stream determinista declarado por su definición.
+El estado mínimo reproducible de un stream contiene seed estable, clave estable y contador de extracción.
+No se utiliza UnityEngine.Random, System.Random, GetHashCode ni el stream del mazo para efectos, eventos o percepción.
+La implementación concreta del generador queda fijada por tests de secuencia para que una misma seed, configuración y decisiones produzcan los mismos resultados en todas las plataformas soportadas.
+
 
 6. Pago de deuda
 Después de cada mano, el jugador puede pagar una parte de su deuda.
@@ -326,14 +365,18 @@ no consume una mano;
 no consume una ronda;
 reduce inmediatamente la deuda restante;
 disminuye la cantidad sobre la que se calcularán los próximos intereses;
-reduce el dinero disponible para apuestas y compras.
+reduce únicamente los saldos de origen indicados;
+solamente la parte debitada de dinero disponible reduce el capital inmediato para apuestas y compras.
 Ejemplo:
 Deuda actual: 200
 Pago realizado: 50
 Deuda restante: 150
 
-El jugador puede pagar cualquier cantidad válida que posea.
-También puede pagar la deuda utilizando dinero protegido.
+El jugador construye cada pago indicando dos importes independientes: importe desde dinero disponible e importe desde dinero protegido.
+La suma debe ser mayor que cero y no puede superar la deuda restante; cada importe debe ser mayor o igual a cero y no puede superar su saldo de origen.
+Primero se validan ambos saldos y la deuda, y después se debitan los dos saldos y se reduce la deuda como una única transacción.
+Si cualquier validación falla no se debita ningún saldo ni se reduce parcialmente la deuda.
+Un pago puede utilizar solamente uno de los saldos dejando el otro importe en cero, o combinar ambos en la misma operación.
 
 7. Intereses
 Los intereses se aplican al finalizar cada ronda.
@@ -357,12 +400,7 @@ Los intereses no se aplican cuando la deuda ya fue pagada por completo.
 El juego debe advertir al jugador antes de finalizar la ronda:
 Al terminar esta ronda se aplicará un interés del 15 %.
 
-El interés del 20 % podrá reservarse para:
-dificultades superiores;
-eventos;
-contratos;
-Endless Debt;
-niveles avanzados.
+La demo no utiliza ninguna tasa alternativa ni contenido que evite el interés.
 
 8. Aumento de la deuda
 La deuda no se duplica al finalizar cada ronda.
@@ -376,9 +414,9 @@ Cuarto ciclo: 1600
 Cuando comienza un nuevo ciclo:
 la deuda base se duplica;
 el contador de rondas vuelve a cuatro;
-la apuesta máxima regresa a su configuración inicial o se adapta al nivel;
+la apuesta máxima vuelve a seguir exactamente la secuencia 20, 25, 30 y 35 para las rondas uno a cuatro del nuevo ciclo;
 no se aplican intereses inmediatamente;
-pueden desbloquearse nuevas cartas, eventos y objetos.
+el catálogo permanece en las cinco especiales, cinco objetos y tres eventos aprobados; la demo no desbloquea contenido adicional por ciclo.
 Los intereses y la duplicación cumplen funciones diferentes:
 El interés castiga el paso de las rondas sin pagar.
 La duplicación representa el avance hacia un nivel de deuda más difícil.
@@ -405,6 +443,7 @@ El estado mecánico correspondiente será DemoCompleted.
 
 9. Abandono de una ronda
 Después de resolver una mano, el jugador puede abandonar la ronda actual.
+También puede abandonarla desde FundingRequired aunque todavía no haya completado una mano en esa ronda. Esta excepción evita un bloqueo cuando paga un ciclo y comienza el siguiente con menos dinero que la apuesta mínima.
 Al hacerlo:
 conserva el dinero que no haya apostado;
 pierde las manos restantes de esa ronda;
@@ -425,11 +464,14 @@ Plantarse termina el turno del jugador dentro de una mano.
 Abandonar termina anticipadamente toda la ronda.
 
 10. Dinero protegido
-El jugador puede utilizar objetos para proteger parte de su dinero.
-El jugador elige cuánto desea guardar, pero el objeto determina el límite máximo.
-Ejemplos:
-Objeto básico: protege hasta 20 monedas.
-Objeto mejorado: protege hasta 30 monedas.
+El único origen de capacidad de dinero protegido aprobado para la demo es la función pasiva de IT-04 Caja de Pucho.
+Poseer esa instancia habilita una capacidad máxima de 20 monedas protegidas, equivalentes a 2.000 unidades internas.
+La run comienza con 0 monedas protegidas.
+
+Durante Preparación, incluido FundingRequired, el jugador puede depositar o retirar cualquier cantidad positiva que no exceda el saldo de origen ni la capacidad restante.
+La transferencia debita un saldo y acredita el otro como una única transacción.
+Una transferencia inválida no modifica ninguno de los dos saldos.
+No se puede depositar ni retirar durante una mano activa.
 
 El dinero protegido:
 no puede apostarse directamente;
@@ -437,562 +479,985 @@ no se pierde en derrotas normales;
 puede utilizarse para pagar deuda;
 no puede modificarse durante el turno del Dealer;
 puede depositarse o retirarse entre manos;
-puede ser afectado por determinados eventos, contratos u objetos malditos.
+no es afectado directamente por ninguno de los cinco objetos, cinco especiales o tres eventos aprobados, salvo que participe expresamente en un cálculo como SC-05 o IT-03.
 Para apostar dinero protegido, primero debe retirarse del almacenamiento.
+Para pagar deuda puede debitarse directamente el saldo protegido sin transferirlo antes a disponible.
+IT-04 no puede venderse ni descartarse mientras el saldo protegido sea mayor que cero.
 
 11. Derrota y penalizaciones
 Perder una mano
 Cuando pierde una mano, el jugador pierde únicamente la apuesta actual, salvo que exista un efecto adicional.
 No pagar la deuda
-Si termina la cuarta ronda del ciclo sin pagar la deuda, la run entra en una resolución negativa.
-El resultado dependerá de:
-esperanza;
-lucidez;
-dependencia del Dealer;
-pactos aceptados;
-préstamos;
-objetos malditos;
-decisiones narrativas.
-Un posible final consiste en que el protagonista quede atrapado trabajando para el Dealer, pero no será la única consecuencia posible.
-Esperanza en cero
-Puede activar el final de rendición.
-Lucidez crítica
-Puede activar:
-distorsiones permanentes;
-decisiones falsas;
-pérdida de información;
-eventos narrativos;
-finales relacionados con la incapacidad de distinguir el sueño.
+Si termina la cuarta ronda del ciclo sin pagar la deuda, la run entra en DebtDeadlineMissed después de aplicar el interés normal de esa ronda.
+El objeto IT-03 Segunda Oportunidad puede interceptar este resultado una sola vez por run según su definición. Si no lo intercepta, el resultado final se guarda y se bloquean nuevas manos.
 
-12. Sistema de presión
-12.1. Escala
-La presión utilizará una escala de 0 a 100.
-Presión mínima: 0
-Presión máxima: 100
+Alcance de los recursos psicológicos en la demo
+Presión, Lucidez y los cuatro ejes de relación con el Dealer poseen reglas numéricas en esta ficha.
+Esperanza pertenece a la visión del juego completo, pero no es un recurso mecánico de la demo y no altera apuestas, resultados ni finales.
+Los diálogos pueden referirse narrativamente a Esperanza, pero no deben leer un valor inexistente ni modificar reglas.
 
-No se utilizará un máximo de 45 %, porque impediría alcanzar los umbrales superiores y bloquear decisiones de manera coherente.
+12. Sistema de Presión y Lucidez
 
-12.2. Generación de presión
-El reparto inicial no aumenta la presión.
-La presión aumenta mediante decisiones y situaciones de riesgo:
-Acción
-Presión
-Pedir una carta adicional
-+10
-Pedir después de una derrota previa
-+15
-Realizar un all-in
-+15
-Utilizar una carta maldita
-+10 a +25
-Aceptar una oferta peligrosa
-+10 a +20
-Sufrir un evento crítico
-+15 a +25
-Perder una mano traumática
-+10
+12.1. Unidad, límites y persistencia de Presión
+Presión es un recurso entero medido en puntos.
+Valor inicial: 0 puntos.
+Valor mínimo: 0 puntos.
+Valor máximo: 100 puntos.
 
-Los valores pueden modificarse según:
-estado de la run;
-esperanza;
-lucidez;
-relación con el Dealer;
-cantidad de derrotas consecutivas;
-efectos activos.
-Regla normativa para pedir después de una derrota:
-El valor de +15 reemplaza al +10 base; representa el total de Presión de cada carta pedida bajo esa condición y no se suma como +10 +15.
-Ejemplo:
-Sin derrota previa:
-Pedir una carta → +10.
+Toda suma o reducción de Presión indicada en esta ficha expresa puntos absolutos, nunca un porcentaje del valor actual.
+Después de cada modificación se aplica:
+Presión nueva = mínimo entre 100 y máximo entre 0 y Presión actual + variación.
 
-La mano anterior fue derrota:
-Pedir una carta → +15.
-Pedir otra carta en esa misma mano → +15.
+La Presión se acumula y persiste entre manos, rondas y ciclos de la misma run.
+No se reinicia ni disminuye por el paso del tiempo.
+Una run nueva comienza otra vez en 0.
 
-Al comenzar la mano posterior:
-Se vuelve a +10, salvo que la mano recién terminada también haya sido derrotada.
+12.2. Fuentes de Presión
+El reparto inicial, los robos del Dealer, las cartas numéricas de reemplazo y los robos obligatorios provocados por efectos no generan Presión por sí mismos.
 
+Pedir carta voluntariamente durante PlayerTurn:
++10 puntos por cada comando válido.
 
-12.3. Umbrales
-0 a 24 — Control
-No existen penalizaciones mecánicas.
-El entorno se mantiene relativamente estable.
-El Dealer se comporta de manera profesional.
-25 a 49 — Tensión
-Cambia la música.
-La iluminación se vuelve inestable.
-El Dealer realiza comentarios.
-Aumenta ligeramente la probabilidad de eventos.
-Algunos números pueden parpadear, pero siguen siendo legibles.
-50 a 69 — Distorsión
-Aumentan los eventos negativos.
-Las cartas pueden mostrar brevemente valores falsos.
-La lucidez determina si el jugador detecta la distorsión.
-Los objetos que muestran probabilidades pierden precisión.
-El Dealer puede ocultar parte de la información.
-70 a 84 — Crisis
-Algunos objetos de ayuda pueden quedar bloqueados.
-Ciertas ofertas no pueden rechazarse sin pagar.
-La música y el entorno presentan distorsiones fuertes.
-El jugador no puede utilizar objetos destinados a calcular probabilidades.
-El Dealer se vuelve más agresivo.
-85 a 99 — Colapso
-El jugador no puede abandonar la ronda durante una mano activa.
-Pueden ocultarse descripciones de cartas especiales.
-Aumenta considerablemente la posibilidad de un evento crítico.
-Algunos objetos pueden funcionar de manera incorrecta.
-100 — Ruptura
-Se activa una única crisis crítica.
-El entorno sufre una transformación importante.
-Se aplica una penalización narrativa o mecánica.
-Las acciones básicas de pedir carta y plantarse permanecen disponibles.
-La presión se mantiene en 100 hasta que sea reducida mediante un objeto o efecto.
-Nunca deben bloquearse todas las acciones del jugador.
+Pedir carta cuando el resultado de la mano inmediatamente anterior fue una derrota:
++15 puntos por cada comando válido.
+El valor de +15 reemplaza al +10 base; nunca se calcula como +10 +15.
+Una victoria, un empate, un empate técnico o un Empate protegido eliminan esta condición para la mano siguiente.
+La condición se vuelve a evaluar después de cada mano y puede atravesar el cambio de ronda o ciclo.
 
-12.4. Presión y valor de las cartas
-La presión no cambia silenciosamente el valor real de una carta.
-En su lugar, puede alterar la forma en que el jugador la percibe.
-Ejemplo:
-Valor real de la carta: 8
-Valor mostrado temporalmente: 6
+Confirmar un all-in:
++15 puntos una sola vez, después de bloquear correctamente la apuesta y antes de iniciar el reparto.
+Una apuesta rechazada o cancelada no genera Presión.
 
-El cálculo interno continúa utilizando el valor real.
-Solamente un evento o efecto que indique explícitamente “modificar el valor de una carta” puede cambiar su valor mecánico.
-Esto diferencia:
-distorsión visual;
-modificación real de las reglas.
+Perder una mano cuya apuesta bloqueada era all-in:
++10 puntos al confirmar la derrota.
+Este incremento representa la derrota traumática y se aplica además del +15 generado al confirmar el all-in.
+Una pérdida normal no agrega Presión por sí sola.
 
-12.5. Relación entre presión y lucidez
-La presión determina cuándo aparecen las distorsiones.
-La lucidez determina cuánto puede confiar el jugador en lo que observa.
-Ejemplos:
-Presión alta y lucidez alta
-La carta muestra un valor falso durante un instante.
-El jugador recibe una señal visual o sonora.
-Puede descubrir el valor real.
-Presión alta y lucidez baja
-El valor falso permanece visible.
-Las advertencias son menos claras.
-Algunos textos pueden desaparecer.
-El jugador puede tomar decisiones utilizando información incorrecta.
+Objetos, cartas especiales y eventos:
+Aplican únicamente el valor exacto declarado en sus respectivas definiciones.
+No se agrega ningún rango genérico adicional por ser una carta maldita, una oferta o un evento.
 
-12.6. Reducción de presión
-La presión no se reinicia automáticamente después de cada mano o ronda.
-Puede reducirse mediante objetos o decisiones concretas.
-Objeto inicial:
-Pastillas
-Usos: 3
-Reducción por uso: 30 puntos de presión
+Esperanza, relación con el Dealer, deuda y racha de derrotas no multiplican ni modifican estos valores durante la demo.
 
-Otros efectos futuros pueden reducirla:
-pagar una cantidad importante de deuda;
-observar un recuerdo positivo;
-rechazar un pacto;
-ganar con 23;
-utilizar determinados objetos;
-completar eventos narrativos.
-La presión nunca puede ser inferior a cero.
+Momento de aplicación:
+al confirmar all-in se aplican +15 después de bloquear la apuesta y antes de extraer la primera carta;
+al confirmar Pedir se aplican +10 o +15 después de validar el comando y antes de extraer la carta;
+las especiales encontradas durante ese robo aplican después sus propios deltas en orden de aparición;
+la distorsión perceptiva del reemplazo numérico utiliza la Presión resultante;
+la derrota traumática de un all-in se aplica después de liquidar la apuesta y antes de habilitar PostHand.
+
+Un comando rechazado o cancelado no modifica Presión.
+Si un Pedir válido termina en empate técnico por agotamiento, conserva el incremento porque la decisión de riesgo ya fue confirmada.
+
+12.3. Bandas y efectos exactos
+Las probabilidades se expresan en puntos base: 100 % equivale a 10.000 puntos base.
+La probabilidad efectiva de un evento se calcula así:
+probabilidad efectiva = probabilidad base × multiplicador de la banda de Presión / 10.000.
+Se aplica redondeo aritmético una sola vez al punto base más cercano y el resultado se limita a 10.000.
+
+Control, de 0 a 24:
+Multiplicador de eventos: 1,00, equivalente a 10.000 puntos base.
+Probabilidad de distorsión perceptiva por carta visible: 0 %.
+Restricciones de objetos: ninguna.
+Descripción de cartas especiales: completa.
+
+Tensión, de 25 a 49:
+Multiplicador de eventos: 1,25, equivalente a 12.500 puntos base.
+Probabilidad de distorsión perceptiva por carta visible: 0 %.
+Restricciones de objetos: ninguna.
+Descripción de cartas especiales: completa.
+Música, iluminación, animaciones y comentarios cambian de forma audiovisual, sin alterar otras reglas.
+
+Distorsión, de 50 a 69:
+Multiplicador de eventos: 1,50, equivalente a 15.000 puntos base.
+Probabilidad de distorsión perceptiva por carta visible: 10 %, equivalente a 1.000 puntos base.
+Restricciones de objetos: ninguna.
+Descripción de cartas especiales: completa.
+
+Crisis, de 70 a 84:
+Multiplicador de eventos: 1,75, equivalente a 17.500 puntos base.
+Probabilidad de distorsión perceptiva por carta visible: 20 %, equivalente a 2.000 puntos base.
+IT-01 Lupa de prestamista queda bloqueada mientras la Presión permanezca en esta banda.
+Los demás objetos conservan exactamente su comportamiento declarado.
+Descripción de cartas especiales: completa.
+El Dealer puede reaccionar de forma más agresiva en animación y diálogo, pero su estrategia continúa plantándose en 17 durante la demo.
+
+Colapso, de 85 a 99:
+Multiplicador de eventos: 2,00, equivalente a 20.000 puntos base.
+Probabilidad de distorsión perceptiva por carta visible: 35 %, equivalente a 3.500 puntos base.
+IT-01 Lupa de prestamista queda bloqueada.
+Al aparecer una carta especial se muestran siempre su nombre, tipo de activación y coste de aceptación o rechazo, pero su descripción mecánica permanece oculta hasta que la decisión queda resuelta.
+Ningún objeto falla aleatoriamente sólo por estar en Colapso.
+
+Ruptura de Presión, exactamente en 100:
+Multiplicador de eventos: 2,00, equivalente a 20.000 puntos base.
+Probabilidad de distorsión perceptiva por carta visible: 50 %, equivalente a 5.000 puntos base.
+Mantiene las restricciones y el ocultamiento de Colapso.
+La primera entrada en Ruptura de Presión de una run resta 25 puntos de Lucidez y marca PressureRuptureTriggered.
+PressureRuptureTriggered sólo puede activarse una vez por run, aunque la Presión baje y vuelva a 100.
+La Presión permanece en 100 hasta que un efecto la reduzca.
+Pedir carta y plantarse nunca quedan bloqueados por Presión.
+
+Fuera de lo indicado en esta tabla, la Presión no cambia payouts, apuestas, orden del mazo, cantidad de cartas especiales, estrategia del Dealer ni funcionamiento de objetos.
+
+12.4. Distorsión perceptiva de cartas
+La distorsión perceptiva es visual y nunca modifica el ID, rango, palo ni valor mecánico real de una carta.
+Se comprueba una sola vez cuando una carta numérica pasa a estar visible para el jugador.
+Una carta boca abajo no se comprueba hasta el momento en que se revela.
+Cambiar de banda después de esa comprobación no repite la tirada de la misma carta.
+Si SC-03 o EV-03 mantienen la carta explícitamente oculta, no se realiza ni se consume una tirada de percepción para esa carta.
+
+La tirada utiliza un stream RNG de percepción separado del mazo y de los eventos, y tiene éxito con roll menor que la probabilidad de la banda en puntos base.
+En caso de éxito se selecciona uniformemente un valor visual entre 1 y 10, excluyendo el valor visual mecánico vigente.
+Para esa exclusión, As equivale a 1; las cartas 2 a 9 equivalen a su número; 10, J, Q y K equivalen a 10.
+Si la instancia posee un override mecánico de EV-02, se excluye el valor 1 a 10 de ese override en lugar del valor base.
+El valor falso 1 se presenta como As de valor visual fijo 1, sin flexibilidad 1 u 11; los valores 2 a 9 conservan su rango; para el valor 10 se selecciona uniformemente entre 10, J, Q y K, excluyendo además el mismo rango real si pudiera coincidir.
+El palo no cambia.
+El total mostrado se calcula temporalmente con el rango falso; el total mecánico continúa calculándose con la carta real.
+La carta, la tirada y el rango falso se registran para poder reproducir la partida.
+
+Los ocultamientos explícitos de SC-03 Apagón y EV-03 Distraído tienen prioridad sobre la distorsión perceptiva y no son revelados por Lucidez.
+Las modificaciones mecánicas explícitas, como EV-02 Miau o IT-05 Moneda de la suerte, se aplican al cálculo real y no se consideran distorsiones.
+Toda revelación realizada al comenzar Resolution queda exenta de una nueva tirada de distorsión y cancela cualquier distorsión pendiente sobre la carta, porque el resultado debe explicar valores reales.
+
+12.5. Lucidez
+Lucidez es un recurso entero medido en puntos.
+Valor inicial: 100 puntos.
+Valor mínimo: 0 puntos.
+Valor máximo inicial: 100 puntos.
+Las modificaciones expresadas en esta ficha son puntos absolutos y se limitan al intervalo vigente.
+Lucidez persiste entre manos, rondas y ciclos y no se regenera automáticamente.
+Victorias, derrotas y pagos de deuda no modifican Lucidez durante la demo salvo que un contenido lo indique expresamente.
+
+Lucidez clara, de 70 a 100:
+Una distorsión perceptiva muestra el rango falso durante 0,75 segundos, emite una señal audiovisual inequívoca de distorsión y después muestra el rango real.
+
+Lucidez inestable, de 40 a 69:
+Una distorsión perceptiva muestra el rango falso durante 2 segundos, emite una señal audiovisual sutil y después muestra el rango real.
+
+Lucidez confusa, de 1 a 39:
+Una distorsión perceptiva permanece hasta que el jugador confirma su siguiente comando válido de pedir, plantarse o utilizar un objeto. No se emite una advertencia que confirme el engaño.
+
+Lucidez crítica, exactamente en 0:
+Una distorsión perceptiva permanece hasta la resolución de la mano y no emite advertencia.
+
+La duración y el tipo de señal de una distorsión quedan fijados usando la Lucidez vigente en el instante en que se crea.
+Un cambio posterior de Lucidez no acorta, prolonga ni reclasifica una distorsión ya activa.
+Las distorsiones nunca bloquean botones, input ni comandos válidos: el jugador puede decidir mientras observa el rango falso.
+En Lucidez confusa, el comando se valida y se confirma usando siempre el estado mecánico real; inmediatamente después de aceptar ese comando se eliminan las distorsiones que vencían con él y luego continúa su efecto mecánico.
+En Lucidez clara o inestable, el temporizador audiovisual se pausa junto con la pausa general del juego y continúa al reanudar.
+Entrar en Resolution cancela cualquier temporizador pendiente y muestra los valores reales antes de presentar el resultado.
+
+Llegar a 0 de Lucidez no termina mecánicamente la run en la demo.
+SC-05 Tenemos un trato puede reducir el máximo de Lucidez de la run. Si el máximo baja por debajo del valor actual, el valor actual se limita inmediatamente al nuevo máximo.
+
+12.6. Relación con el Dealer
+No existe una única variable denominada Favor del Dealer.
+La relación utiliza cuatro ejes enteros independientes:
+Respeto;
+Codicia;
+Dependencia;
+Desconfianza.
+
+Cada eje comienza en 0, posee mínimo 0, máximo 100 y persiste durante la run.
+Los ejes permanecen ocultos para el jugador y solamente se publican para diálogos reactivos y para mostrarse como datos del resumen final.
+No eligen ni alteran DemoCompleted o DebtDeadlineMissed y no modifican automáticamente Presión, probabilidades, precios, mazo, payouts ni estrategia del Dealer durante la demo.
+
+Cambios aprobados:
+Confirmar un all-in: Codicia +10.
+Usar correctamente IT-01 Lupa de prestamista: Desconfianza +10.
+Activar IT-03 Segunda Oportunidad: Dependencia +20.
+Aceptar SC-05 Tenemos un trato: Dependencia +25 y Codicia +15.
+Rechazar SC-05 Tenemos un trato: Desconfianza +10.
+
+Respeto no recibe cambios con el contenido aprobado y permanece en 0.
+No deben inventarse cambios por ganar, perder, investigar o comprar mientras no se agreguen a una nueva versión de esta ficha.
+
+12.7. Reducción de Presión
+La demo sólo reduce Presión mediante efectos que declaran un valor exacto.
+IT-04 Caja de Pucho reduce 15 puntos por uso.
+EV-01 Voces del más allá reduce 15 puntos cuando se acepta y resuelve.
+Ganar, llegar a 23, pagar deuda, cambiar de mano o rechazar una oferta no reducen Presión automáticamente.
+
+12.8. Eventos observables y orden de actualización
+Cada modificación válida se completa primero en el estado interno y después publica un evento con valor anterior, variación solicitada, valor final, causa y banda resultante.
+Si una misma acción genera varias modificaciones, se aplican en el orden en que aparecen sus causas. Después de cada una se recalcula la banda.
+La entrada en Ruptura de Presión se comprueba después de limitar el nuevo valor de Presión.
+Un fallo de presentación, audio o diálogo no puede deshacer ni interrumpir la modificación ya confirmada.
 
 13. Objetos
-13.1. Capacidad
-Durante la demo, el jugador puede:
-Llevar hasta 4 objetos a la mesa.
-Guardar hasta 2 objetos en el almacenamiento.
 
-La capacidad limitada obliga a decidir:
-qué objetos comprar;
-qué objetos llevar;
-cuáles conservar;
-cuáles utilizar;
-cuáles dejar fuera de la ronda.
+13.1. Capacidad
+El jugador puede llevar hasta 4 instancias de objeto a la mesa y guardar hasta 2 en el almacenamiento.
+Cada instancia ocupa un espacio completo aunque conserve varias cargas.
+Solamente los objetos llevados a la mesa pueden usarse o activarse automáticamente.
+Un objeto almacenado conserva sus usos, pero no produce efectos.
+La capacidad pasiva de dinero protegido de IT-04 es la única excepción y permanece disponible tanto en mesa como en almacenamiento.
+El inventario y los usos restantes persisten entre manos, rondas y ciclos.
+
+Durante Preparación puede moverse una instancia entre mesa y almacenamiento sin gastar dinero, cargas, acciones, manos ni rondas.
+Si el destino posee un espacio libre, la transferencia ocupa ese espacio.
+Si el destino está lleno, el jugador puede seleccionar una instancia del destino y confirmar un intercambio atómico; cancelar o elegir una operación inválida no mueve ningún objeto.
+No pueden reorganizarse objetos durante una mano activa.
+Las activaciones manuales y automáticas siguen exigiendo que la instancia esté en la mesa.
 
 13.2. Fases de utilización
-Cada objeto debe declarar en qué fases puede utilizarse.
 Preparación
-Antes de elegir la apuesta.
+Es una ventana funcional, no un valor adicional de GamePhase.
+Está abierta en Betting antes de bloquear una apuesta, en PostHand, en RoundSettlement antes de confirmar el cierre y en FundingRequired, siempre que no exista una mano activa ni una apuesta bloqueada.
+Durante RoundSettlement el jugador puede pagar deuda, reorganizar objetos, transferir dinero protegido y usar IT-04 antes de ordenar el cierre; esto permite equipar IT-03 antes de la ventana BeforeRunFailureCommitted.
 Previa al reparto
-Después de apostar y antes de recibir las cartas.
+Después de bloquear la apuesta y antes de extraer la primera carta.
 Turno del jugador
-Mientras puede pedir o plantarse.
-Previa al Dealer
-Después de que el jugador se planta y antes de que actúe el Dealer.
+Después de completar el reparto inicial y mientras todavía puede pedir o plantarse.
 Resolución
-Cuando se determina el resultado de la mano.
-Los objetos de resolución pueden activarse automáticamente.
-Ejemplos:
-Objeto
-Momento de uso
-Cerilla
-Turno del jugador
-Analgésico
-Preparación o turno del jugador
-Ticket de empeño
-Previa al reparto
-Protector de pérdida
-Resolución automática
-Moneda marcada
-Turno del jugador
-Pastillas
-Preparación o turno del jugador
-
+Ventanas automáticas internas posteriores a calcular una mano y anteriores a confirmar su resultado.
+Resolución de run
+Ventana automática posterior a calcular el resultado de un ciclo y anterior a guardar un resultado terminal.
 
 13.3. Objetivos válidos
 Cada objeto, carta o efecto debe indicar sobre qué elemento puede actuar.
-Objetivos posibles:
+La siguiente lista de TargetKind es exhaustiva para el contenido aprobado:
 jugador;
 Dealer;
 carta del jugador;
 carta del Dealer;
 próxima carta del mazo;
+pila de robo restante;
+reemplazo numérico pendiente;
 apuesta;
 deuda;
-presión;
+Presión;
+Lucidez;
+relación con el Dealer;
+total mecánico de una mano;
+resultado de la mano;
+recompensa de la mano;
+información visible;
 reglas de la mano;
 ronda actual;
-objeto activo.
-Ejemplos:
-Efecto
-Objetivo
-Reducir valor
-Carta propia visible
-Revelar carta
-Carta oculta o próxima carta
-Proteger dinero
-Apuesta actual
-Reducir presión
-Jugador
-Bloquear acción
-Dealer
-Cambiar objetivo de 23
-Reglas de la mano
-Aumentar 
-deuda
-Deuda actual
+ciclo de deuda actual;
+run actual;
+objeto activo;
+sistema de activación de objetos.
 
+13.4. Reglas comunes de los objetos de la demo
+La demo utiliza exactamente estos cinco IDs:
+IT-01 Lupa de prestamista.
+IT-02 Último aliento.
+IT-03 Segunda Oportunidad.
+IT-04 Caja de Pucho.
+IT-05 Moneda de la suerte.
 
-13.4. Catálogo de objetos de la demo
+Pastillas no forma parte de la demo y no constituye un sexto objeto. Puede reconsiderarse para el juego completo después de validar el prototipo.
 
-La demo utiliza exactamente cinco objetos.
-Los nombres presentados anteriormente como ejemplos no forman parte
-automáticamente de la demo salvo que aparezcan en esta tabla.
+Precio base significa precio de compra y se paga una sola vez desde dinero disponible.
+Ninguno de los cinco objetos posee coste monetario de activación.
+No se puede poseer simultáneamente más de una instancia del mismo ID, contando mesa y almacenamiento.
+Una compra inválida no descuenta dinero.
 
-Cada objeto debe declarar:
-ID
-Nombre
-Tipo
-Precio
-Usos
-Fases permitidas
-Objetivos válidos
-Efecto
-Duración
-Categoría de acumulación
-Presión generada o reducida
-Condición de consumo
+El catálogo de la demo ofrece los cinco IDs en toda ventana de Preparación y no depende de ciclo, ronda, Presión ni RNG.
+IT-04 ya poseído aparece como no comprable al comenzar la run.
+Para comprar, el jugador elige mesa o almacenamiento y debe existir un espacio libre en el destino; la compra debita el precio y crea la instancia como una sola transacción.
+La tienda no vende automáticamente, no reemplaza objetos y no concede crédito.
+Cuando una instancia desaparece puede comprarse otra con sus cargas iniciales, salvo que el ID ya esté poseído o que IT-03 ya se haya activado en esa run.
 
+Durante Preparación puede descartarse voluntariamente una instancia sin recibir dinero.
+Descartar exige confirmación y es atómico; IT-04 además exige saldo protegido igual a cero.
+La demo no permite vender objetos ni recuperar parte del precio de compra.
 
-ID
-Objeto
-Tipo
-Precio
-Usos
-Fase
-Objetivo
-Efecto
-IT-01
-Por definir
-Consumible
-—
-—
-—
-—
-—
-IT-02
-Por definir
-Consumible
-—
-—
-—
-—
-—
-IT-03
-Por definir
-Consumible
-—
-—
-—
-—
-—
-IT-04
-Por definir
-Reutilizable
-—
-—
-—
-—
-—
-IT-05
-Por definir
-Protección
-—
-—
-—
-—
-—
+Los usos no se recargan al cambiar de mano, ronda o ciclo.
+Al llegar a cero usos la instancia se elimina, con la única excepción de IT-04: su función consumible queda agotada, pero la instancia permanece como contenedor de dinero protegido.
 
+Flujo de un objeto manual:
+se valida fase, objetivo, bloqueo, cargas y precondiciones sin modificar estado;
+se muestra la previsualización;
+el jugador puede cancelar sin coste;
+al confirmar se consume una carga y se aplica el efecto como una sola transacción;
+si la validación falla no se consume la carga.
 
+Usar un objeto manual no reemplaza pedir o plantarse.
+Mientras una activación se resuelve no puede comenzar otra acción.
 
-*El sistema de Pastillas ya tiene números definidos —tres usos y −30 de presión—, por lo que probablemente debería ser uno de los cinco. 
+Flujo de un objeto automático:
+no requiere confirmación;
+se comprueba solamente en su ventana declarada;
+se consume únicamente cuando el efecto se aplica con éxito;
+una condición que no se cumple, un bloqueo o una tirada fallida no consume el objeto.
 
+Un bloqueo general de objetos impide activaciones manuales y automáticas pendientes, pero no revierte efectos ya aplicados ni consume los objetos bloqueados.
+La Presión no provoca fallos aleatorios genéricos en objetos.
 
+Prioridad de protecciones después de evaluar una carta del jugador:
+primero se aplican los modificadores mecánicos ya activos;
+después se calcula el total real;
+si el total es exactamente 24 se comprueba IT-05 Moneda de la suerte;
+se vuelve a calcular el total;
+si todavía supera 23 se comprueba IT-02 Último aliento;
+si ninguna protección resuelve el exceso se confirma la derrota.
+
+Durante el reparto inicial, esta secuencia se difiere hasta completar los seis espacios numéricos y resolver EV-02 y EV-03.
+Durante un robo voluntario se ejecuta inmediatamente después de obtener el reemplazo numérico y resolver las especiales encadenadas.
+EV-01 sólo se comprueba después de esta secuencia y únicamente si la mano continúa hacia PlayerTurn.
+
+13.5. IT-01 — Lupa de prestamista
+ID: IT-01
+Tipo: Consumible manual.
+Precio base: 40 monedas.
+Usos por instancia: 1.
+Fase permitida: Turno del jugador, antes de plantarse.
+Objetivo: La única carta oculta del Dealer.
+Selección de objetivo: Automática.
+Coste de activación: Ninguno.
+
+Efecto:
+Revela el rango, palo y valor real de la carta oculta durante el resto de la mano.
+La carta continúa perteneciendo al Dealer y no cambia su valor mecánico.
+Cuando comienza DealerTurn, la carta ya revelada no se agrega por segunda vez a la vista pública.
+La revelación específica de la Lupa evita una distorsión perceptiva sobre esa carta.
+
+Consecuencias:
+Desconfianza del Dealer: +10 puntos.
+Presión: 0 puntos.
+Lucidez: 0 puntos.
+
+Duración: Hasta terminar la mano actual.
+Categoría de acumulación: Información de carta oculta.
+Consume acción: No.
+Condición de consumo: Confirmar y revelar correctamente una carta todavía oculta.
+
+Casos inválidos:
+no existe una mano activa;
+el reparto inicial no terminó;
+la carta oculta ya fue revelada;
+el jugador ya se plantó;
+los objetos están bloqueados;
+SC-03 Apagón está activo;
+Presión es 70 o superior.
+
+En cualquiera de esos casos no se consume el objeto.
+La instancia sin utilizar persiste entre manos, rondas y ciclos.
+
+13.6. IT-02 — Último aliento
+ID: IT-02
+Tipo: Protección automática consumible.
+Precio base inicial: 20 monedas.
+Precio después de su primera activación en la run: 40 monedas.
+Usos por instancia: 1.
+Fase: Resolución automática anterior a confirmar una derrota por superar 23.
+Objetivos: Jugador, apuesta bloqueada y resultado de la mano.
+Coste de activación: Ninguno.
+
+Condición:
+El total mecánico real del jugador continúa siendo superior a 23 después de resolver IT-05 y cualquier modificador anterior.
+
+Efecto:
+evita la derrota por exceso;
+termina inmediatamente la mano;
+el Dealer no realiza su turno;
+devuelve completamente la apuesta bloqueada;
+otorga ganancia neta cero;
+registra el resultado Empate protegido;
+consume normalmente una de las cinco manos de la ronda.
+
+Empate protegido no cuenta como victoria ni derrota, no activa la derrota traumática y corta la condición de derrota previa para la mano siguiente.
+
+Después de la primera activación exitosa de IT-02, su precio de compra pasa de 20 a 40 monedas durante el resto de esa run.
+El aumento sucede una sola vez, no se acumula y vuelve al precio base en una run nueva.
+
+Presión: 0 puntos.
+Lucidez: 0 puntos.
+Duración del efecto: Instantánea.
+Categoría de acumulación: Protección contra derrota por exceso.
+Consume acción: No.
+Condición de consumo: Convertir efectivamente una derrota por exceso en Empate protegido.
+
+No se activa ni consume cuando:
+el total es 23 o inferior;
+la mano termina por otra causa;
+IT-05 ya corrigió el total a 23;
+el objeto está almacenado;
+los objetos automáticos están bloqueados.
+
+El cambio de precio forma parte del estado persistente de la run.
+
+13.7. IT-03 — Segunda Oportunidad
+ID: IT-03
+Tipo: Protección automática de run.
+Precio base: 50 monedas.
+Usos por instancia: 1.
+Límite: Una activación máxima por run.
+Fase: Después de aplicar el interés de la cuarta ronda y antes de confirmar DebtDeadlineMissed o crear el resultado final.
+Objetivo: Ciclo de deuda actual.
+Coste de activación: Ninguno.
+
+Condiciones:
+la deuda continúa activa al cerrar la cuarta ronda;
+el resultado pendiente es exclusivamente DebtDeadlineMissed;
+el objeto está en la mesa y conserva su uso;
+no fue activado anteriormente en esa run;
+dinero disponible más dinero protegido es igual o superior a la apuesta mínima.
+
+Efecto:
+cancela una sola vez la confirmación de DebtDeadlineMissed;
+mantiene el mismo ciclo y la deuda restante después del interés ya aplicado;
+crea una ronda extraordinaria de hasta cinco manos;
+usa la apuesta mínima normal y el máximo de la cuarta ronda;
+crea un mazo nuevo con la siguiente seed determinista de la run;
+mantiene RuleRoundIndex en 4 para las reglas de apuesta, pero registra RoundOrdinal 5, un RoundInstanceId único e IsExtraordinary igual a true para no colisionar con la cuarta ronda normal;
+registra la ronda, sus identificadores y su seed en el historial;
+conserva dinero disponible, dinero protegido, inventario, Presión y relaciones;
+fija Lucidez exactamente en 40 puntos;
+aumenta Dependencia del Dealer en 20 puntos;
+no entrega dinero ni reduce deuda;
+no aplica interés al comenzar la ronda extraordinaria.
+
+Si la deuda se paga durante la ronda extraordinaria, la progresión continúa normalmente o finaliza en DemoCompleted si era el cuarto ciclo.
+Si la ronda extraordinaria termina o se abandona sin pagar, se aplica una vez el interés normal y se confirma DebtDeadlineMissed.
+No puede activarse otra Segunda Oportunidad.
+
+Si el dinero utilizable es inferior a la apuesta mínima, el objeto no se activa ni se consume y se confirma DebtDeadlineMissed.
+Los bloqueos limitados a la ronda que acaba de terminar expiran antes de comprobar IT-03.
+
+Presión: No cambia y conserva su valor.
+Duración: Una ronda extraordinaria.
+Categoría de acumulación: Protección de final por deuda.
+Consume acción: No.
+Condición de consumo: Crear exitosamente la ronda extraordinaria.
+
+No se activa frente a DemoCompleted, abandono definitivo del jugador ni finales futuros que tengan otra causa.
+El indicador SecondChanceUsed y la ronda extraordinaria deben persistir y aparecer en el resultado de la run.
+
+13.8. IT-04 — Caja de Pucho
+ID: IT-04
+Tipo: Reutilizable manual por cargas.
+Precio base: 20 monedas.
+Usos por instancia: 3.
+Objeto inicial: El jugador comienza cada run con una instancia gratuita de tres usos colocada en la mesa. Ocupa uno de los cuatro espacios y puede moverse al almacenamiento durante Preparación.
+Fases permitidas: Preparación y Turno del jugador.
+Objetivos: Presión y Lucidez del jugador.
+Coste de activación: Ninguno.
+
+Efecto por uso:
+Presión: -15 puntos.
+Lucidez: -30 puntos.
+Ambos valores se limitan a sus intervalos válidos después de aplicar el cambio.
+
+Si se usa durante Preparación, aplica Visión borrosa durante la siguiente mano.
+Si se usa durante PlayerTurn, aplica Visión borrosa durante el resto de la mano actual.
+Visión borrosa es un efecto audiovisual: no mueve la cámara, no altera input, no oculta controles y no cambia valores mecánicos.
+
+Duración de la reducción: Instantánea.
+Duración de Visión borrosa: La mano indicada.
+Categoría de acumulación: Deterioro visual.
+Consume acción: No.
+Condición de consumo: Confirmar el uso con Presión superior a cero.
+
+Puede utilizarse varias veces en una misma mano si conserva cargas.
+Las reducciones se aplican secuencialmente; Visión borrosa no aumenta de intensidad ni extiende su duración por repetir el uso en la misma mano.
+
+Casos inválidos:
+Presión igual a cero;
+fase no permitida;
+objeto almacenado;
+objetos manuales bloqueados.
+
+Lucidez igual a cero no vuelve inválido el uso: permanece en cero y la carga sigue consumiéndose porque la reducción de Presión sí se aplica.
+Los usos restantes no se recargan.
+
+Función pasiva de almacenamiento:
+Mientras la instancia exista, habilita la capacidad de 20 monedas protegidas definida en la sección 10, aunque esté en la mesa, en almacenamiento o ya no conserve cargas.
+Llegar a cero cargas no elimina esta función pasiva.
+SC-02 y cualquier otro bloqueo de activaciones no deshabilitan esta capacidad ni impiden depositar o retirar durante Preparación.
+Una instancia sin cargas puede descartarse sin reembolso solamente si el saldo protegido es cero; después podrá comprarse otra con tres cargas en una ventana de Preparación.
+
+13.9. IT-05 — Moneda de la suerte
+ID: IT-05
+Tipo: Protección automática probabilística.
+Precio base: 35 monedas.
+Usos por instancia: 1 activación exitosa.
+Probabilidad: 10 %, equivalente a 1.000 puntos base.
+Fase: Después de completar y evaluar el reparto inicial, o inmediatamente después de evaluar el reemplazo numérico de un robo voluntario, siempre antes de confirmar una derrota por exceso.
+Objetivo: Total mecánico real de la mano del jugador.
+Coste de activación: Ninguno.
+
+Condición de comprobación:
+El total mecánico real es exactamente 24 después de calcular ases y aplicar modificadores anteriores.
+Se comprueba tanto sobre el total final de las tres cartas iniciales como sobre el total posterior a una carta pedida o su reemplazo numérico.
+
+Éxito:
+aplica un modificador mecánico de -1 al total de la mano actual;
+no cambia ID, rango, palo ni valor base de ninguna carta;
+el total real pasa de 24 a 23;
+la Moneda se rompe y se elimina;
+la mano termina inmediatamente como victoria normal;
+el Dealer no realiza su turno;
+si ocurrió con tres cartas no concede el premio de 23 inicial;
+el payout neto es 92 % o 110 % si la apuesta era all-in.
+
+Fallo:
+no modifica el total;
+no consume la Moneda;
+no repite la tirada para la misma carta;
+continúa la resolución y después puede intervenir IT-02.
+
+RNG:
+Utiliza un stream determinista exclusivo identificado como IT-05, derivado de la seed de ronda, mano y número de comprobación.
+La activación tiene éxito si el roll uniforme entre 0 y 9.999 es menor que 1.000.
+No utiliza ni avanza el stream del mazo.
+Se registran probabilidad, roll y resultado.
+
+Presión: No agrega puntos; conserva el incremento que haya generado pedir la carta.
+Lucidez: 0 puntos.
+Duración del modificador: La mano actual, que termina inmediatamente.
+Categoría de acumulación: Corrección del total de mano.
+Consume acción: No.
+Condición de consumo: Tirada exitosa que corrige 24 a 23.
+
+No se comprueba cuando:
+el total real es 23 o inferior;
+el total real es 25 o superior;
+solamente el total visual muestra 24;
+la mano pertenece al Dealer;
+el objeto está almacenado;
+los objetos automáticos están bloqueados.
 14. Cartas especiales
-Las cartas especiales pueden beneficiar o perjudicar tanto al jugador como al Dealer.
-Ejemplos:
-aumentar la recompensa;
-disminuir la probabilidad de obtener cartas altas;
-revelar una carta;
-ocultar valores;
-bloquear un objeto;
-cambiar temporalmente el objetivo;
-proteger una parte de la apuesta;
-aumentar la deuda;
-terminar anticipadamente una ronda.
-Las cartas especiales pueden ser:
-Obligatorias
-Se ejecutan inmediatamente.
-Opcionales
-El jugador puede aceptarlas o rechazarlas.
-Ofertas del Dealer
-Pueden rechazarse a cambio de dinero, esperanza, lucidez u otra consecuencia.
-14.1. Catálogo de cartas especiales de la demo
-Para cada carta se debe declarar:
-ID
-Nombre
-Categoría
-Tipo de activación
-Fase
-Objetivo
-Efecto
-Coste
-Coste de rechazo
-Presión generada
-Duración
-Categoría de acumulación
-Consumo de acción, mano o ronda
 
+14.1. Reglas comunes
+Las cinco cartas regresan al mazo al comenzar cada ronda y siguen el flujo de extracción y reemplazo definido en 2.2.
+Las decisiones de cartas especiales no tienen límite de tiempo durante la demo.
+Mientras una decisión está abierta, el gameplay permanece pausado y no acepta otra acción.
 
-ID
-Carta
-Tipo
-Fase
-Objetivo
-Efecto
-Rechazo
-Presión
-SC-01
-Por definir
-Positiva
-Reparto
-Por definir
-Por definir
-—
-Por definir
-SC-02
-Por definir
-Negativa
-Reparto
-Por definir
-Por definir
-—
-Por definir
-SC-03
-Por definir
-Evento
-Por definir
-Por definir
-Por definir
-Por definir
-Por definir
-SC-04
-Por definir
-Maldita
-Por definir
-Por definir
-Por definir
-Por definir
-Por definir
-SC-05
-Por definir
-Oferta
-Por definir
-Por definir
-Por definir
-Por definir
-Por definir
+Los costes monetarios se pagan exclusivamente desde dinero disponible.
+No pueden pagarse con dinero protegido ni con la apuesta bloqueada.
+El pago, la decisión, el efecto y la retirada forman una transacción: si la validación falla no se produce una mutación parcial.
 
+En SC-01 a SC-04, si el jugador no posee el coste completo del rechazo, esa opción queda deshabilitada y el efecto se ejecuta.
+SC-05 posee una alternativa de rechazo propia para conservar la decisión voluntaria del pacto.
 
+Los valores de Presión son puntos enteros y representan el delta total de la carta.
+Rechazar una especial la retira durante la ronda actual y no modifica su probabilidad en rondas posteriores.
+Ninguna carta especial consume por sí misma una acción, mano o ronda.
 
+Definiciones individuales de las cartas especiales de la demo
 
+14.2. SC-01 — Suerte de principiante
+ID: SC-01.
+Categoría: Positiva.
+Tipo de activación: Elección opcional.
+Oportunidad: Al extraerse durante cualquier robo numérico.
+Objetivo: Pila de robo restante de la ronda.
+Coste de aceptación: Ninguno.
+Coste de rechazo: 10 monedas.
+Sin fondos para rechazar: Se ejecuta el efecto.
+Presión: 0 puntos.
+Duración: Instantánea.
+Categoría de acumulación: Orden del mazo.
+Consume acción, mano o ronda: No.
+
+Al aceptar, el Dealer vuelve a barajar únicamente las cartas que todavía permanecen en la pila de robo.
+Se incluyen cartas numéricas y especiales que aún no aparecieron.
+Se excluyen manos actuales, descartes de manos anteriores, especiales retiradas y SC-01.
+Después se continúa buscando el reemplazo numérico para el receptor original.
+
+El rebarajado utiliza un stream determinista separado identificado como SC01_RESHUFFLE.
+No utiliza el stream del mazo original ni el de emergencia.
+Se registran la decisión, el coste, la seed derivada y la cantidad de cartas rebarajadas.
+
+Si quedan menos de dos cartas en la pila, rebarajar no podría modificar el orden.
+En ese caso no se presenta la elección, no se cobra rechazo y se continúa con el reemplazo normal.
+
+14.3. SC-02 — Ataque de pánico
+ID: SC-02.
+Categoría: Negativa.
+Tipo de activación: Elección opcional.
+Oportunidad: Al extraerse durante cualquier robo numérico.
+Objetivo: Jugador y activación de objetos.
+Coste de aceptación: Ninguno.
+Coste de rechazo: 25 monedas.
+Sin fondos para rechazar: Se ejecuta el efecto.
+Presión al ejecutarse: +20 puntos.
+Duración: Desde su activación hasta cerrar la ronda actual.
+Categoría de acumulación: Bloqueo de objetos.
+Consume acción, mano o ronda: No.
+
+Mientras está activo:
+no pueden confirmarse nuevos usos manuales de objetos;
+no pueden dispararse objetos automáticos pendientes;
+los efectos ya aplicados permanecen activos;
+los objetos bloqueados no consumen cargas;
+cartas especiales, eventos, apuestas, pagos de deuda, pedir y plantarse siguen disponibles.
+
+El bloqueo expira al cerrar la ronda y antes de comprobar IT-03 Segunda Oportunidad.
+Si coexistiera otro bloqueo de la misma categoría, se conserva la fecha de finalización posterior.
+La Presión aumenta aunque el jugador no tenga objetos equipados.
+
+14.4. SC-03 — Apagón
+ID: SC-03.
+Categoría: De evento.
+Tipo de activación: Elección opcional.
+Oportunidad: Al extraerse durante cualquier robo numérico.
+Objetivo: Información visual de la mano actual.
+Coste de aceptación: Ninguno.
+Coste de rechazo: 30 monedas.
+Sin fondos para rechazar: Se ejecuta el efecto.
+Presión al ejecutarse: +25 puntos.
+Duración: Hasta comenzar la resolución de la mano actual.
+Categoría de acumulación: Ocultación global de cartas.
+Consume acción, mano o ronda: No.
+
+Mientras está activo:
+se oscurecen cara, rango y palo de todas las cartas visibles;
+las cartas numéricas nuevas también se presentan oscurecidas;
+los totales mostrados se reemplazan por información desconocida;
+la carta oculta del Dealer continúa siendo una carta oculta;
+controles y decisiones permanecen visibles;
+los valores mecánicos reales no cambian;
+el evaluador continúa utilizando las cartas reales.
+
+Al comenzar Resolution se retira el ocultamiento y se muestran cartas y totales reales antes del resultado.
+Lucidez no revela anticipadamente la información ocultada por Apagón.
+IT-01 Lupa no puede utilizarse mientras Apagón está activo.
+Apagón no activa EV-01, EV-02 ni EV-03: es una carta especial de categoría De evento, no un evento independiente.
+
+14.5. SC-04 — Tercer ojo
+ID: SC-04.
+Categoría: Maldita.
+Tipo de activación: Elección opcional.
+Oportunidad: Al extraerse durante cualquier robo numérico.
+Objetivo: Reemplazo numérico pendiente.
+Coste de aceptación: Ninguno.
+Coste de rechazo: 25 monedas.
+Sin fondos para rechazar: Se ejecuta el efecto y el jugador debe elegir.
+Presión al ejecutarse: +40 puntos.
+Duración: Instantánea.
+Categoría de acumulación: Elección de carta.
+Consume acción, mano o ronda: No.
+
+El sistema localiza internamente las primeras dos cartas numéricas de la pila restante.
+Las especiales intermedias se ignoran sin revelarse, retirarse ni cambiar su orden.
+Los dos candidatos se presentan como reversos A y B sin ID, rango, palo, valor ni probabilidad.
+Ningún efecto de información de la demo revela esos candidatos.
+
+La carta elegida se retira de su posición y completa el robo pendiente del receptor original.
+La carta no elegida permanece en su posición original.
+Si SC-04 apareció durante un robo del Dealer, el jugador también elige a ciegas cuál recibe el Dealer.
+No se realiza un segundo reemplazo.
+
+Si quedan menos de dos cartas numéricas en la pila actual, el efecto no puede activarse.
+No se presenta rechazo, no se agrega Presión y se continúa con el reemplazo normal.
+Ese reemplazo puede activar después la recuperación de descartes o el empate técnico definidos en 2.4.
+
+El historial interno registra los dos IDs candidatos y la elección.
+La interfaz y el historial visible no revelan la carta no elegida.
+
+14.6. SC-05 — Tenemos un trato
+ID: SC-05.
+Categoría: Maldita.
+Tipo de activación: Oferta del Dealer.
+Oportunidad: Al extraerse durante cualquier robo numérico.
+Objetivo: Jugador y estado persistente de la run.
+Coste de aceptación: Entregar un ojo.
+Coste de rechazo: 16 monedas.
+Presión al aceptar: +50 puntos.
+Duración: Hasta terminar la run.
+Categoría de acumulación: Sacrificio persistente.
+Consume acción, mano o ronda: No.
+
+Al aceptar se calcula:
+patrimonio líquido = dinero disponible + dinero protegido + apuesta bloqueada.
+
+Se acredita al dinero disponible un bonus exactamente igual a ese patrimonio.
+Esto duplica el patrimonio líquido existente en ese instante, pero no modifica deuda, inventario ni valor de objetos.
+
+Ejemplo:
+Dinero disponible: 40.
+Dinero protegido: 0.
+Apuesta bloqueada: 10.
+Bonus: 50.
+Patrimonio líquido posterior: 100.
+
+Después de acreditar el bonus:
+se establece EyeSurrendered en verdadero;
+el máximo de Lucidez de la run pasa de 100 a 70 y la Lucidez actual se limita al nuevo máximo;
+Dependencia aumenta 25 puntos;
+Codicia aumenta 15 puntos;
+Presión aumenta 50 puntos;
+se activa una viñeta monocular persistente para Presentation.
+
+La viñeta no modifica cámara, input, valores de cartas ni precisión de interacciones.
+Sólo puede entregarse un ojo por run.
+Si SC-05 reaparece con EyeSurrendered verdadero, la oferta es inválida: se retira sin coste, sin Presión y sin cambios de relación, y se obtiene el reemplazo normal.
+
+Rechazo con fondos:
+se pagan 16 monedas disponibles;
+Desconfianza aumenta 10 puntos;
+no se entrega el ojo, no se recibe bonus y no se agregan los 50 puntos de Presión.
+
+Rechazo sin fondos suficientes:
+el jugador puede rechazar igualmente para que el pacto nunca sea obligatorio;
+no se realiza pago parcial;
+Presión aumenta 16 puntos;
+Desconfianza aumenta 10 puntos;
+no se entrega el ojo ni se recibe bonus.
+
+Orden de aceptación:
+primero se valida la oferta y se calcula el patrimonio;
+después se acredita el bonus;
+luego se aplica el sacrificio y sus cambios persistentes;
+por último se aplica Presión y se comprueba la entrada en Ruptura de Presión.
 15. Eventos de la demo
-
 La demo utiliza exactamente tres eventos independientes.
-Una carta especial puede activar un evento, pero la carta y el evento
-se consideran definiciones diferentes.
+No forman parte del mazo y SC-03 Apagón no cuenta como uno de ellos.
+Cada evento posee un checkpoint propio y se comprueba como máximo una vez por mano.
+Cuando un ID se activa, aunque sea rechazado, no vuelve a comprobarse durante esa ronda.
+Una tirada fallida permite volver a comprobar ese ID en la siguiente mano de la misma ronda.
+Los tres IDs pueden coexistir en una misma mano.
 
-Cada evento debe declarar:
-ID
-Nombre
-Oportunidad de activación
-Probabilidad base
-Modificador por presión
-Fases válidas
-Puede rechazarse
-Coste del rechazo
-Consecuencia del rechazo
-Efecto
-Duración
-Consumo de acción, mano o ronda
-Límite de activaciones
+Orden cronológico posible:
+EV-02 durante el reparto de las primeras cuatro cartas visibles.
+EV-03 al asignar la tercera carta numérica inicial del jugador.
+EV-01 después de terminar el reparto y antes de PlayerTurn.
 
+Ningún evento consume una acción, mano o ronda.
+Los eventos que alteran una mano expiran en la resolución, aunque la ronda continúe.
+Las decisiones de EV-01 y EV-03 no tienen límite de tiempo en la demo.
+Mientras una decisión de evento está abierta, el flujo que alcanzó el checkpoint queda suspendido y no acepta otro comando hasta confirmar resolución o rechazo.
 
-ID
-Evento
-Se comprueba
-Probabilidad
-Rechazable
-Coste
-Efecto
-Consume
-EV-01
-Por definir
-Por definir
-—
-Sí/No
-—
-—
-—
-EV-02
-Por definir
-Por definir
-—
-Sí/No
-—
-—
-—
-EV-03
-Por definir
-Por definir
-—
-Sí/No
-—
-—
-—
+15.1. Probabilidad, RNG e historial
+La probabilidad efectiva utiliza la fórmula y el multiplicador de Presión definidos en 12.3.
+Se lee la Presión ya confirmada al llegar al checkpoint, después de todos los efectos anteriores en el orden de resolución y antes de consumir el roll de trigger.
+Los cambios de Presión posteriores no recalculan una tirada ya realizada.
+Cada comprobación genera un entero uniforme entre 0 y 9.999.
+El evento se activa cuando la tirada es menor que la probabilidad efectiva en puntos base.
 
+Cada ID y cada finalidad aleatoria utilizan un stream determinista separado del mazo:
+EV01_TRIGGER, EV01_TRUTH y EV01_SIGNAL.
+EV02_TRIGGER, EV02_TARGET y EV02_VALUE.
+EV03_TRIGGER.
 
+Resolver, rechazar o fallar un evento no avanza el stream del mazo ni los streams de los otros eventos.
+No se utiliza UnityEngine.Random.
 
+El historial interno registra:
+ID del contenido;
+ciclo, ronda, mano y orden de resolución;
+checkpoint;
+seed y clave de stream;
+tirada y probabilidad efectiva;
+elección del jugador;
+costes pagados;
+recursos antes y después;
+cartas y valores reales afectados;
+información falsa emitida;
+inicio y vencimiento de efectos.
+
+El historial visible no revela cartas ocultas, candidatos no elegidos ni si EV-01 mintió.
+El historial interno de reproducción conserva el orden inicial, el historial completo de extracciones, las cartas ocultas y los datos secretos necesarios para repetir la run.
+Ese registro interno sólo puede ser consumido por lógica de guardado, reproducción o diagnóstico autorizada.
+Presentation recibe un read model sanitizado y nunca accede directamente a InitialOrder, DrawHistory completo, candidatos no elegidos ni rolls secretos.
+La interfaz pública de sesión debe separar ambos modelos en lugar de confiar en que cada presenter ignore campos sensibles.
+
+15.2. EV-01 — ¿Voces del más allá?
+ID: EV-01.
+Oportunidad: Después de completar el reparto inicial y de resolver un posible EV-02 o EV-03, pero antes de entrar en PlayerTurn.
+Precondición: La mano del jugador no terminó durante el reparto por 23, exceso o empate técnico.
+Probabilidad base: 15 %, equivalente a 1.500 puntos base.
+Probabilidad por banda: 15 %; 18,75 %; 22,50 %; 26,25 %; 30 %.
+Rechazable: Sí.
+Coste del rechazo: 20 monedas disponibles.
+Sin fondos para rechazar: El evento se resuelve.
+Objetivo: Información sobre las tres cartas iniciales actuales del Dealer.
+Duración: El mensaje permanece disponible hasta resolver la mano.
+Límite: Una activación por ronda.
+Consume acción, mano o ronda: No.
+
+Al resolverse, la radio responde si el total mecánico actual del Dealer es exactamente 23.
+Se incluye la carta oculta y cualquier override mecánico, y los ases se evalúan con las reglas normales.
+
+Un roll separado decide el mensaje:
+si el roll de EV01_TRUTH es menor que 7.000, responde la verdad;
+en caso contrario, invierte la respuesta correcta.
+
+Con Lucidez de 70 o superior se realiza una comprobación adicional EV01_SIGNAL.
+Si el mensaje era falso, la señal aparece con 80 % de probabilidad, es decir roll menor que 8.000.
+Si el mensaje era verdadero, aparece como falso positivo con 20 % de probabilidad, es decir roll menor que 2.000.
+La señal aumenta o reduce la sospecha, pero nunca prueba con certeza la respuesta correcta.
+Con Lucidez inferior a 70 no se consume EV01_SIGNAL ni aparece esa señal.
+
+Después de emitir el mensaje, Presión se reduce 15 puntos y se limita a cero.
+Si se rechaza, se pagan 20 monedas, no se emite mensaje, no se reduce Presión y el ID queda utilizado durante esa ronda.
+
+15.3. EV-02 — Miau
+ID: EV-02.
+Oportunidad: Después de asignar correctamente P1, D1, P2 y D2 durante el reparto inicial.
+Probabilidad base: 12 %, equivalente a 1.200 puntos base.
+Probabilidad por banda: 12 %; 15 %; 18 %; 21 %; 24 %.
+Rechazable: No.
+Coste: Ninguno.
+Objetivo: Una de P1, D1, P2 o D2.
+Lucidez: -25 puntos.
+Duración: Hasta terminar la mano.
+Categoría de acumulación: Override mecánico de carta.
+Límite: Una activación por ronda.
+Consume acción, mano o ronda: No.
+
+Al activarse:
+se selecciona uniformemente una de las cuatro cartas visibles;
+se construye en orden ascendente el conjunto de los nueve valores entre 1 y 10 distintos del valor base de selección;
+EV02_VALUE selecciona uniformemente un índice de ese conjunto, sin tiradas de rechazo;
+la instancia seleccionada usa exclusivamente el nuevo valor durante esa mano;
+Lucidez disminuye 25 puntos.
+
+Para seleccionar el valor se considera:
+As: valor base 1.
+Cartas 2 a 10: su número.
+J, Q y K: valor base 10.
+
+Si se selecciona un As, pierde temporalmente su flexibilidad 1 u 11 y utiliza exclusivamente el override.
+ID, rango y palo originales no cambian, pero Presentation marca visualmente el valor reemplazado.
+El evaluador utiliza el override real: no es una distorsión perceptiva.
+Si la carta seleccionada tenía una distorsión perceptiva pendiente, esa distorsión se cancela y Presentation muestra el override mecánico, salvo que SC-03 la mantenga explícitamente oculta.
+No se realiza una segunda tirada de distorsión sobre esa instancia durante la misma mano.
+
+Si otro efecto modifica la misma instancia, el override confirmado más reciente reemplaza al anterior.
+Overrides sobre cartas diferentes pueden coexistir.
+Al terminar la mano se elimina el override y la definición original permanece intacta.
+
+15.4. EV-03 — Distraído
+ID: EV-03.
+Oportunidad: Al asignar la tercera carta numérica inicial del jugador y antes de mostrar su cara.
+Probabilidad base: 8 %, equivalente a 800 puntos base.
+Probabilidad por banda: 8 %; 10 %; 12 %; 14 %; 16 %.
+Rechazable: Sí.
+Coste del rechazo: 30 monedas disponibles.
+Sin fondos para rechazar: El evento se resuelve.
+Objetivos: Tercera carta inicial del jugador, total visible y recompensa de la mano.
+Lucidez: -30 puntos.
+Duración: Hasta comenzar la resolución de la mano.
+Categorías de acumulación: Ocultación específica de carta y bonus de ganancia neta.
+Límite: Una activación por ronda.
+Consume acción, mano o ronda: No.
+
+Al resolverse:
+la tercera carta inicial permanece visualmente oculta;
+no se muestran rango, palo ni valor;
+el total visible del jugador se reemplaza por información desconocida;
+el evaluador conserva el valor mecánico real;
+Lucidez disminuye 30 puntos;
+se arma un bonus para una posible victoria.
+
+La carta y el total real se revelan al comenzar Resolution.
+Lucidez no permite revelar anticipadamente este ocultamiento explícito.
+
+Si el resultado es una victoria, primero se calcula la ganancia neta base y su redondeo normal.
+Después se calcula un bonus equivalente al 20 % de esa ganancia neta base, usando 2.000 puntos base y la política de redondeo de 5.6.
+La devolución de la apuesta no forma parte de la base del bonus.
+
+Ejemplo con apuesta de 10 y victoria normal:
+Ganancia neta base: 9,20.
+Bonus: 1,84.
+Total recibido: 10 + 9,20 + 1,84 = 21,04 monedas.
+
+La misma regla se aplica a victoria normal, victoria all-in, 23 inicial y 23 inicial all-in.
+No hay bonus en derrota, empate, empate técnico ni Empate protegido.
+
+Si se rechaza, se pagan 30 monedas, la carta se muestra normalmente, Lucidez no cambia y no se arma el bonus.
+EV-03 puede coexistir con SC-03; al comenzar Resolution se eliminan ambos ocultamientos antes de mostrar el resultado.
 16. Cancelación y rechazo
-Cancelar una selección
-Mientras el jugador todavía no confirmó el uso de un objeto, puede cancelar sin perderlo.
-Confirmar un objeto
-Después de confirmar:
-se consume el uso;
-se paga el coste;
-el efecto no puede cancelarse.
-Rechazar una carta positiva
-Si el jugador rechaza una carta positiva:
-la carta se retira de la ronda;
-no vuelve al mazo actual;
-su probabilidad de aparición puede reducirse temporalmente.
-Evitar un evento
-Algunos eventos pueden evitarse pagando al Dealer.
-Ese pago:
-no reduce la deuda;
-se entrega directamente al Dealer;
-puede aumentar dependencia o codicia.
-No todos los eventos pueden rechazarse.
-Cada evento deberá indicar:
-Puede rechazarse: sí/no
-Coste del rechazo
-Consecuencia del rechazo
+Una selección manual puede cancelarse hasta su confirmación sin gastar dinero, cargas ni recursos.
+Después de confirmar una acción válida, su transacción termina antes de publicar cambios a Presentation y ya no puede cancelarse.
 
+El precio de compra de un objeto no vuelve a pagarse al utilizarlo.
+Sólo existiría un coste de activación si la definición individual lo declarara; los cinco objetos aprobados poseen coste de activación cero.
+
+Los rechazos monetarios de cartas y eventos:
+se pagan desde dinero disponible;
+no utilizan dinero protegido ni apuesta bloqueada;
+no reducen deuda;
+no se pagan parcialmente;
+se validan antes de retirar dinero.
+
+Si falta dinero:
+SC-01, SC-02, SC-03 y SC-04 ejecutan su efecto.
+EV-01 y EV-03 ejecutan su evento.
+SC-05 permite el rechazo alternativo de +16 puntos de Presión.
+
+Rechazar una carta especial la retira durante la ronda actual y no cambia probabilidades futuras.
+Rechazar un evento cuenta como su activación de esa ronda.
+Las consecuencias de relación con el Dealer sólo se aplican cuando una definición individual las declara.
 
 17. Consumo de acciones
-Debe diferenciarse entre consumir una acción, una mano o una ronda.
 Consumir acción
-El objeto o carta utiliza la acción actual, pero la mano continúa.
+El contenido reemplaza una decisión de PlayerTurn. Después de resolverlo no puede pedir ni plantarse hasta que el flujo vuelva a habilitar una nueva decisión.
 Consumir mano
-La mano termina inmediatamente y se aplica el resultado indicado.
-La ronda continúa con la siguiente mano.
+El contenido finaliza la mano con un resultado explícito y la ronda continúa si corresponde.
 Consumir ronda
-La ronda termina inmediatamente.
-Se pierden las manos restantes y se aplican los intereses correspondientes.
+El contenido cierra la ronda, pierde las manos restantes y aplica el interés normal salvo que indique expresamente lo contrario.
 
-17.1. Evento raro que consume una ronda
-Puede existir una carta o evento extremadamente raro con una probabilidad base aproximada del 3,2 %.
-Al activarse:
-termina la ronda actual;
-se pierden las manos restantes;
-se aplican los intereses;
-no se añade un aumento adicional separado a la deuda.
-Los intereses representan la penalización económica por haber perdido esa ronda.
-
-17.2. Objeto para evitar los intereses
-Puede existir un objeto que permita terminar anticipadamente la ronda sin generar intereses.
-Como penalización:
-el jugador no puede utilizar objetos durante las dos siguientes manos;
-el objeto se consume;
-la ronda se considera utilizada.
-Esto crea una elección entre evitar el aumento de la deuda o conservar el acceso a los objetos.
+Ninguno de los cinco objetos, cinco cartas especiales o tres eventos aprobados consume directamente una acción o una ronda.
+IT-02 termina la mano mediante el resultado Empate protegido, pero no consume una mano adicional.
+IT-05 termina la mano mediante victoria normal, pero no consume una mano adicional.
+Las ideas de un evento raro que consuma la ronda y de un objeto que evite intereses quedan fuera de la demo y no deben programarse en Fase 3.
 
 18. Acumulación y contradicción de efectos
-Los efectos instantáneos pueden utilizarse varias veces.
-Ejemplos:
-reducir presión;
-robar una carta;
-pagar deuda;
-revelar información.
-Los efectos temporales se dividen en categorías.
-Ejemplos de categorías:
-protección de apuesta;
-modificación de recompensa;
-modificación del objetivo;
-bloqueo de objetos;
-información de cartas;
-modificación del Dealer.
-Misma categoría
-Dos efectos temporales de la misma categoría no se acumulan.
-El efecto más reciente reemplaza al anterior.
-Ejemplo:
-Protección actual: 20 monedas
-Nueva protección: 30 monedas
+Los cambios instantáneos de dinero, Presión, Lucidez y relación se aplican secuencialmente y se limitan después de cada operación.
+No se fusionan, porque una operación intermedia puede activar un umbral.
 
-La protección de 30 reemplaza a la de 20.
+Dos efectos temporales de la misma categoría no se suman salvo que una definición lo permita.
+Por defecto, el efecto confirmado más reciente reemplaza al anterior.
+En bloqueos de objetos se conserva la fecha de finalización posterior para que un efecto nuevo no acorte un bloqueo existente.
+Efectos de categorías diferentes pueden coexistir.
 
-Categorías diferentes
-Los efectos pueden coexistir.
-Ejemplo:
-Protección de apuesta
-+ revelación de carta
-+ reducción de presión
+Las denominaciones exactas de las categorías utilizadas por el contenido aprobado son:
+Orden del mazo;
+Bloqueo de objetos;
+Ocultación global de cartas;
+Ocultación específica de carta;
+Información de carta oculta;
+Override mecánico de carta;
+Elección de carta;
+Corrección del total de mano;
+Protección contra derrota por exceso;
+Protección de final por deuda;
+Bonus de ganancia neta;
+Deterioro visual;
+Sacrificio persistente.
 
-Orden de resolución
-Los efectos se procesan en el siguiente orden:
-Se comprueba si la acción es válida.
-Se paga el coste.
-Se consumen los usos necesarios.
-Se ejecutan protecciones automáticas.
-Se aplica el nuevo efecto.
-Se resuelven conflictos con efectos anteriores.
-Se recalculan valores y recursos.
-Se comprueba el resultado de la mano.
-Se eliminan los efectos vencidos.
+Prioridad de información visible:
+durante Resolution siempre se revelan los datos necesarios para explicar el resultado;
+SC-03 oculta toda la información de cartas hasta Resolution;
+EV-03 oculta P3 y el total del jugador hasta Resolution;
+si no existe ocultamiento explícito puede aplicarse una distorsión perceptiva de Presión;
+IT-01 revela información real y evita distorsión sobre su objetivo, pero no puede activarse durante SC-03;
+EV-02 cambia el valor mecánico real antes de determinar qué debe mostrar Presentation.
+Cuando EV-02 selecciona una carta ya mostrada, cancela su distorsión perceptiva anterior y vuelve a presentar el valor mecánico modificado.
+
+Orden transaccional de una acción de contenido:
+se valida fase, objetivo, recursos, bloqueo y límite de uso;
+se reserva la decisión o el robo pendiente;
+se paga el coste aplicable;
+se consume la carga cuando corresponda;
+se aplica el efecto principal;
+se aplican los cambios de recursos en el orden declarado;
+se resuelven conflictos de categoría;
+se recalculan cartas, manos y bandas;
+se ejecutan protecciones automáticas en su prioridad;
+se comprueba el resultado;
+se eliminan efectos vencidos;
+se publican eventos a los observadores después de dejar el estado consistente.
+
+Si una especial o evento aparece mientras otro contenido se resuelve, se encola y se procesa después de terminar la transacción actual.
+No puede haber dos decisiones simultáneas.
+Una excepción de UI, audio, diálogo o animación se registra, pero no revierte una transacción ya confirmada.
 
 19. Configuración inicial resumida
 Dinero inicial: 50 monedas
 
 Deuda inicial: 200 monedas
 
-Rondas por ciclo: 4
+Rondas ordinarias por ciclo: 4
+Ronda extraordinaria posible: 1, exclusivamente mediante IT-03 una vez por run
 
 Manos por ronda: 5
 
@@ -1024,8 +1489,17 @@ Mazo numérico:
 Cartas especiales:
 5 cartas únicas
 
+Eventos independientes:
+3
+
 Presión:
-0 a 100
+Inicial 0; mínimo 0; máximo 100
+
+Lucidez:
+Inicial 100; mínimo 0; máximo inicial 100
+
+Relación con el Dealer:
+Respeto 0; Codicia 0; Dependencia 0; Desconfianza 0
 
 Objetos en la mesa:
 4
@@ -1033,15 +1507,65 @@ Objetos en la mesa:
 Objetos almacenados:
 2
 
-Usos iniciales de las pastillas:
-3
+Objeto inicial:
+IT-04 Caja de Pucho, 3 usos, equipada en la mesa
 
-Reducción de presión por pastilla:
-30 puntos
+Efecto de Caja de Pucho por uso:
+Presión -15; Lucidez -30
 
 Límite del Dealer:
 Se planta con 17 o más
 
-Estas reglas representan el punto de partida para la demo. Los porcentajes económicos, la cantidad de manos, la generación de presión y el comportamiento del Dealer deberán mantenerse configurables para poder ajustarlos después de las pruebas.
+Esperanza:
+No es un recurso mecánico de la demo
+
+Los valores de balance, probabilidades y duraciones deberán mantenerse configurables.
+Las fases, objetivos, orden transaccional, condiciones de consumo y casos borde constituyen reglas semánticas y no deben cambiarse desde un inspector sin actualizar esta ficha.
+
+20. Cierre de Gate A
+Gate A queda aprobado con las definiciones de esta versión:
+cinco cartas especiales SC-01 a SC-05;
+cinco objetos IT-01 a IT-05;
+tres eventos EV-01 a EV-03;
+Presión, Lucidez y relación con el Dealer;
+reglas de RNG, rechazo, consumo, persistencia y acumulación.
+
+Fase 3 puede comenzar utilizando estas definiciones como contrato.
+No deben agregarse efectos genéricos basados en ejemplos descartados del GDD.
+Los nuevos recursos persistentes, flags, cargas, overrides, posiciones de RNG y efectos activos deben formar parte del snapshot de la run aunque el guardado durable completo se implemente en Fase 6.
+
+La máquina de estados deberá incorporar o modelar explícitamente:
+resolución de contenido con fase anterior y robo pendiente suspendidos;
+decisión de carta especial;
+decisión de evento;
+ventana PostCardEvaluation para IT-05 e IT-02;
+ventana BeforeRunFailureCommitted para IT-03;
+FundingRequired como fase con PreparationWindow activa y abandono permitido;
+operaciones atómicas para depositar y retirar dinero protegido durante PreparationWindow;
+reevaluación Betting/FundingRequired después de cada transacción económica de Preparación;
+Empate protegido como resultado distinto de empate normal;
+ronda extraordinaria con RuleRoundIndex 4, RoundOrdinal 5, RoundInstanceId único e IsExtraordinary.
+
+El estado persistente mínimo nuevo incluye:
+Presión y banda actual;
+Lucidez y máximo vigente;
+Respeto, Codicia, Dependencia y Desconfianza;
+resultado de la mano anterior;
+inventario, ubicación y cargas por instancia;
+dinero protegido y capacidad vigente aportada por IT-04;
+LastBreathPriceDoubled;
+SecondChanceUsed y ronda extraordinaria;
+EyeSurrendered;
+PressureRuptureTriggered;
+efectos temporales activos y vencimientos;
+overrides mecánicos de la mano;
+estado y posición de cada stream RNG;
+contenido o decisión pendiente, receptor original y flujo suspendido;
+historial interno reproducible separado del read model sanitizado de Presentation.
+
+Las definiciones configurables deberán contener valores de balance y referencias estables a estrategias de efecto.
+Las semánticas diferentes se implementarán mediante estrategias específicas creadas por una Factory, no mediante una cadena central de condicionales por ID.
+Los cambios consumados se publicarán como eventos de dominio para Presentation mediante Observer.
+El estado de run no será un Singleton mutable; Bootstrap conservará una única sesión activa y resolverá sus dependencias.
 
 
