@@ -1,0 +1,26 @@
+:root {
+}
+
+.PlayStyle {
+    position: absolute;
+    top: 896px;
+    left: 862px;
+    width: 241px;
+    background-color: rgb(64, 26, 87);
+    color: rgb(255, 255, 255);
+    -unity-text-outline-color: rgb(0, 0, 0);
+    font-size: 50px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+}
+
+.PlayStyle:focus {
+    background-color: rgb(84, 26, 87);
+    transition-duration: 0.25s;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 15px;
+}

@@ -1,0 +1,16 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/SelectorStyleSheets/PlayButton.uss?fileID=7433441132597879392&amp;guid=4ef59faddc820b24b86a6870cee034bb&amp;type=3#PlayButton"/>
+    <Style src="project://database/Assets/UI%20Toolkit/SelectorStyleSheets/Cards.uss?fileID=7433441132597879392&amp;guid=acbf1389332af5e4d9637f1ea5f37e85&amp;type=3#Cards"/>
+    <ui:VisualElement picking-mode="Ignore" style="flex-grow: 1; background-color: rgb(0, 0, 0);">
+        <ui:VisualElement name="InitialVE" style="flex-grow: 1; display: flex; background-image: none;">
+            <ui:Button text="JUGAR" name="btn-start" class="PlayStyle"/>
+            <ui:Label text="23 AL FILO" style="position: relative; top: 6px; left: 2px; color: rgb(184, 92, 242); font-size: 72px; -unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=eac3a19027155a242b8f637bafe001a5&amp;type=3#NotInter-Regular&quot;); -unity-text-align: upper-center;"/>
+            <ui:Label text="La deuda siempre cobra algo." style="color: rgb(255, 255, 255); font-size: 30px; -unity-text-align: upper-center;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="MenuVE" picking-mode="Ignore" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI%20Toolkit/RenderTexture/GameplayRT.renderTexture?fileID=8400000&amp;guid=76460d1346d157940aedad8e61327fcd&amp;type=2#GameplayRT&quot;); align-self: stretch; flex-direction: row; display: none;">
+            <ui:VisualElement name="Carta1VE" style="flex-grow: 1; position: absolute; height: 480px; top: 195px; width: 381px; left: 409px; background-image: url(&quot;project://database/Assets/UI%20Toolkit/RenderTexture/Card.renderTexture?fileID=8400000&amp;guid=33b61aa5c3268904c88735a1661c63d2&amp;type=2#Card&quot;); display: flex;"/>
+            <ui:VisualElement name="Carta2VE" style="flex-grow: 1; position: absolute; height: 480px; top: 195px; width: 376px; left: 780px; background-image: url(&quot;project://database/Assets/UI%20Toolkit/RenderTexture/Card.renderTexture?fileID=8400000&amp;guid=33b61aa5c3268904c88735a1661c63d2&amp;type=2#Card&quot;); display: flex;"/>
+            <ui:VisualElement name="Carta3VE" style="flex-grow: 1; position: absolute; height: 480px; top: 195px; width: 356px; left: 1175px; background-image: url(&quot;project://database/Assets/UI%20Toolkit/RenderTexture/Card.renderTexture?fileID=8400000&amp;guid=33b61aa5c3268904c88735a1661c63d2&amp;type=2#Card&quot;); display: flex;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
