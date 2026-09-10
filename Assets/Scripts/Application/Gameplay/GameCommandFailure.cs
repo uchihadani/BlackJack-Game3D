@@ -9,6 +9,15 @@ namespace TwentyThree.Application.Gameplay
         DeckUnavailable = 4,
         ActionInProgress = 5,
         RunFinished = 6,
-        InsufficientFundsForMinimumBet = 7
+        InsufficientFundsForMinimumBet = 7,
+        ContentDecisionUnavailable = 8,
+        InvalidContentChoice = 9,
+        ContentRejectionUnavailable = 10,
+        PreparationUnavailable = 11,
+        ItemUnavailable = 12,
+        ItemBlocked = 13,
+        InventoryRejected = 14,
+        ProtectedFundsTransferRejected = 15,
+        DistortionUnavailable = 16
     }
 }

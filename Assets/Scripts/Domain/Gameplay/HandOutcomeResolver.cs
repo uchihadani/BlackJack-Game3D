@@ -45,6 +45,14 @@ namespace TwentyThree.Domain.Gameplay
                 dealerScore);
         }
 
+        public HandResolution ProtectedDraw(HandScore playerScore, HandScore dealerScore)
+        {
+            return new HandResolution(
+                HandOutcome.ProtectedDraw,
+                playerScore,
+                dealerScore);
+        }
+
         private static HandOutcome GetWinningOutcome(HandScore playerScore)
         {
             return playerScore.IsInitialTwentyThree

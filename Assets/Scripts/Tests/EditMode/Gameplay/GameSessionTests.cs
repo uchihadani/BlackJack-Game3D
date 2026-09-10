@@ -328,17 +328,26 @@ namespace TwentyThree.Tests.EditMode.Gameplay
             first.TryConfirmBet(Money.FromCoins(5));
             second.TryConfirmBet(Money.FromCoins(5));
 
-            Assert.That(first.CurrentRoundSeed, Is.EqualTo(12345));
-            Assert.That(second.CurrentRoundSeed, Is.EqualTo(12345));
+            Assert.That(
+                ((IInternalGameSessionDiagnostics)first).CurrentRoundSeed,
+                Is.EqualTo(12345));
+            Assert.That(
+                ((IInternalGameSessionDiagnostics)second).CurrentRoundSeed,
+                Is.EqualTo(12345));
 
             ResolveAndArchiveCurrentRound(first);
             ResolveAndArchiveCurrentRound(second);
 
-            Assert.That(first.CompletedRoundHistory.Single().Seed, Is.EqualTo(12345));
-            Assert.That(second.CompletedRoundHistory.Single().Seed, Is.EqualTo(12345));
+            IInternalGameSessionDiagnostics firstDiagnostics =
+                (IInternalGameSessionDiagnostics)first;
+            IInternalGameSessionDiagnostics secondDiagnostics =
+                (IInternalGameSessionDiagnostics)second;
+
+            Assert.That(firstDiagnostics.CompletedRoundHistory.Single().Seed, Is.EqualTo(12345));
+            Assert.That(secondDiagnostics.CompletedRoundHistory.Single().Seed, Is.EqualTo(12345));
             Assert.That(
-                first.CompletedRoundHistory.Single().DrawHistory.Select(card => card.Id.Value),
-                Is.EqualTo(second.CompletedRoundHistory.Single().DrawHistory.Select(card => card.Id.Value)));
+                firstDiagnostics.CompletedRoundHistory.Single().DrawHistory.Select(card => card.Id.Value),
+                Is.EqualTo(secondDiagnostics.CompletedRoundHistory.Single().DrawHistory.Select(card => card.Id.Value)));
         }
 
         [Test]
@@ -356,8 +365,12 @@ namespace TwentyThree.Tests.EditMode.Gameplay
             IGameSession second = controller.StartNewRun();
 
             Assert.That(first, Is.Not.SameAs(second));
-            Assert.That(first.RunSeed, Is.EqualTo(41));
-            Assert.That(second.RunSeed, Is.EqualTo(42));
+            Assert.That(
+                ((IInternalGameSessionDiagnostics)first).RunSeed,
+                Is.EqualTo(41));
+            Assert.That(
+                ((IInternalGameSessionDiagnostics)second).RunSeed,
+                Is.EqualTo(42));
             Assert.That(controller.Current, Is.SameAs(second));
             Assert.That(changes, Is.EqualTo(2));
         }
@@ -441,7 +454,9 @@ namespace TwentyThree.Tests.EditMode.Gameplay
             IGameSession nextSession = controller.StartNewRun();
 
             Assert.That(controller.CompletedRuns, Has.Count.EqualTo(1));
-            Assert.That(controller.CompletedRuns[0], Is.SameAs(completedSession.FinalResult));
+            Assert.That(
+                controller.CompletedRuns[0],
+                Is.SameAs(((IRunCompletionSource)completedSession).FinalResult));
             Assert.That(controller.CompletedRuns[0].Status, Is.EqualTo(RunStatus.DemoCompleted));
             Assert.That(completionEvents, Is.EqualTo(1));
             Assert.That(nextSession, Is.Not.SameAs(completedSession));

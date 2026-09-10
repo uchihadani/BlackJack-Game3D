@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TwentyThree.Domain.Cards;
+using TwentyThree.Domain.SpecialCards;
 
 namespace TwentyThree.Application.Gameplay
 {
@@ -10,6 +11,9 @@ namespace TwentyThree.Application.Gameplay
         private readonly ReadOnlyCollection<NumericCard> _initialOrder;
         private readonly ReadOnlyCollection<NumericCard> _drawHistory;
         private readonly ReadOnlyCollection<DeckReshuffleRecord> _reshuffles;
+        private readonly ReadOnlyCollection<DeckEntry> _initialEntryOrder;
+        private readonly ReadOnlyCollection<DeckEntry> _entryDrawHistory;
+        private readonly ReadOnlyCollection<SpecialCardId> _retiredSpecialCards;
 
         public RoundHistoryEntry(RoundDeck deck)
         {
@@ -22,6 +26,9 @@ namespace TwentyThree.Application.Gameplay
             _initialOrder = Array.AsReadOnly(Copy(deck.InitialOrder));
             _drawHistory = Array.AsReadOnly(Copy(deck.DrawHistory));
             _reshuffles = Array.AsReadOnly(Copy(deck.ReshuffleHistory));
+            _initialEntryOrder = Array.AsReadOnly(Copy(deck.InitialEntryOrder));
+            _entryDrawHistory = Array.AsReadOnly(Copy(deck.EntryDrawHistory));
+            _retiredSpecialCards = Array.AsReadOnly(Copy(deck.RetiredSpecialCards));
         }
 
         public int Seed { get; }
@@ -31,6 +38,12 @@ namespace TwentyThree.Application.Gameplay
         public IReadOnlyList<NumericCard> DrawHistory => _drawHistory;
 
         public IReadOnlyList<DeckReshuffleRecord> Reshuffles => _reshuffles;
+
+        public IReadOnlyList<DeckEntry> InitialEntryOrder => _initialEntryOrder;
+
+        public IReadOnlyList<DeckEntry> EntryDrawHistory => _entryDrawHistory;
+
+        public IReadOnlyList<SpecialCardId> RetiredSpecialCards => _retiredSpecialCards;
 
         private static T[] Copy<T>(IReadOnlyList<T> source)
         {

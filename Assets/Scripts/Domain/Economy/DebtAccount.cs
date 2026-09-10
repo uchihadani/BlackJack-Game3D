@@ -36,12 +36,63 @@ namespace TwentyThree.Domain.Economy
 
         public bool TryPayFromAvailable(Wallet wallet, Money amount)
         {
-            return TryPay(wallet, amount, false);
+            return TryPay(
+                wallet,
+                new DebtPaymentAllocation(amount, Money.Zero)).Succeeded;
         }
 
         public bool TryPayFromProtected(Wallet wallet, Money amount)
         {
-            return TryPay(wallet, amount, true);
+            return TryPay(
+                wallet,
+                new DebtPaymentAllocation(Money.Zero, amount)).Succeeded;
+        }
+
+        public DebtPaymentResult TryPay(Wallet wallet, DebtPaymentAllocation allocation)
+        {
+            if (wallet == null)
+            {
+                throw new ArgumentNullException(nameof(wallet));
+            }
+
+            lock (sync)
+            {
+                lock (wallet.SynchronizationRoot)
+                {
+                    if (!allocation.TryGetTotal(out Money total))
+                    {
+                        return DebtPaymentResult.Failed(DebtPaymentFailure.AmountOverflow, remaining);
+                    }
+
+                    if (total == Money.Zero)
+                    {
+                        return DebtPaymentResult.Failed(DebtPaymentFailure.AmountMustBePositive, remaining);
+                    }
+
+                    if (total > remaining)
+                    {
+                        return DebtPaymentResult.Failed(DebtPaymentFailure.ExceedsRemainingDebt, remaining);
+                    }
+
+                    if (allocation.FromAvailable > wallet.Available)
+                    {
+                        return DebtPaymentResult.Failed(DebtPaymentFailure.InsufficientAvailableFunds, remaining);
+                    }
+
+                    if (allocation.FromProtected > wallet.Protected)
+                    {
+                        return DebtPaymentResult.Failed(DebtPaymentFailure.InsufficientProtectedFunds, remaining);
+                    }
+
+                    if (!wallet.TryDebitAllocated(allocation.FromAvailable, allocation.FromProtected))
+                    {
+                        return DebtPaymentResult.Failed(DebtPaymentFailure.WalletChanged, remaining);
+                    }
+
+                    remaining -= total;
+                    return DebtPaymentResult.Success(total, remaining);
+                }
+            }
         }
 
         public Money ApplyInterest(BasisPoints interestRate)
@@ -60,37 +111,5 @@ namespace TwentyThree.Domain.Economy
             }
         }
 
-        private bool TryPay(Wallet wallet, Money amount, bool useProtectedFunds)
-        {
-            if (wallet == null)
-            {
-                throw new ArgumentNullException(nameof(wallet));
-            }
-
-            if (amount == Money.Zero)
-            {
-                return false;
-            }
-
-            lock (sync)
-            {
-                if (amount > remaining)
-                {
-                    return false;
-                }
-
-                bool debited = useProtectedFunds
-                    ? wallet.TryDebitProtected(amount)
-                    : wallet.TryDebitAvailable(amount);
-
-                if (!debited)
-                {
-                    return false;
-                }
-
-                remaining -= amount;
-                return true;
-            }
-        }
     }
 }

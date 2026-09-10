@@ -8,6 +8,8 @@ namespace TwentyThree.Domain.Economy
         private Money available;
         private Money protectedFunds;
 
+        internal object SynchronizationRoot => sync;
+
         public Wallet(Money available)
             : this(available, Money.Zero)
         {
@@ -84,6 +86,74 @@ namespace TwentyThree.Domain.Economy
             {
                 Money updated = protectedFunds + amount;
                 protectedFunds = updated;
+            }
+        }
+
+        internal bool TryDebitAllocated(Money fromAvailable, Money fromProtected)
+        {
+            lock (sync)
+            {
+                if (fromAvailable > available || fromProtected > protectedFunds)
+                {
+                    return false;
+                }
+
+                Money updatedAvailable = available - fromAvailable;
+                Money updatedProtected = protectedFunds - fromProtected;
+                available = updatedAvailable;
+                protectedFunds = updatedProtected;
+                return true;
+            }
+        }
+
+        internal bool TryTransferAvailableToProtected(Money amount, Money capacity)
+        {
+            lock (sync)
+            {
+                if (amount == Money.Zero || amount > available || protectedFunds > capacity)
+                {
+                    return false;
+                }
+
+                Money remainingCapacity = capacity - protectedFunds;
+
+                if (amount > remainingCapacity)
+                {
+                    return false;
+                }
+
+                Money updatedAvailable = available - amount;
+                Money updatedProtected = protectedFunds + amount;
+                available = updatedAvailable;
+                protectedFunds = updatedProtected;
+                return true;
+            }
+        }
+
+        internal bool TryTransferProtectedToAvailable(Money amount)
+        {
+            lock (sync)
+            {
+                if (amount == Money.Zero || amount > protectedFunds)
+                {
+                    return false;
+                }
+
+                Money updatedAvailable;
+
+                try
+                {
+                    updatedAvailable = available + amount;
+                }
+                catch (OverflowException)
+                {
+                    return false;
+                }
+
+                Money updatedProtected = protectedFunds - amount;
+                available = updatedAvailable;
+                protectedFunds = updatedProtected;
+                return true;
             }
         }
     }

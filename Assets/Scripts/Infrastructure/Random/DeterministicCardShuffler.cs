@@ -4,16 +4,33 @@ using TwentyThree.Domain.Cards;
 
 namespace TwentyThree.Infrastructure.Random
 {
-    public sealed class DeterministicCardShuffler : ICardShuffler
+    public sealed class DeterministicCardShuffler : ICardShuffler, IDeckEntryShuffler
     {
         public IReadOnlyList<NumericCard> Shuffle(
             IReadOnlyList<NumericCard> cards,
             int seed,
             int streamIndex)
         {
-            if (cards == null)
+            return ShuffleCore(cards, seed, streamIndex, nameof(cards));
+        }
+
+        public IReadOnlyList<DeckEntry> ShuffleEntries(
+            IReadOnlyList<DeckEntry> entries,
+            int seed,
+            int streamIndex)
+        {
+            return ShuffleCore(entries, seed, streamIndex, nameof(entries));
+        }
+
+        private static IReadOnlyList<T> ShuffleCore<T>(
+            IReadOnlyList<T> source,
+            int seed,
+            int streamIndex,
+            string parameterName)
+        {
+            if (source == null)
             {
-                throw new ArgumentNullException(nameof(cards));
+                throw new ArgumentNullException(parameterName);
             }
 
             if (streamIndex < 0)
@@ -21,22 +38,22 @@ namespace TwentyThree.Infrastructure.Random
                 throw new ArgumentOutOfRangeException(nameof(streamIndex));
             }
 
-            NumericCard[] shuffledCards = new NumericCard[cards.Count];
-            for (int index = 0; index < cards.Count; index++)
+            T[] shuffledValues = new T[source.Count];
+            for (int index = 0; index < source.Count; index++)
             {
-                shuffledCards[index] = cards[index];
+                shuffledValues[index] = source[index];
             }
 
             StableRandom random = new StableRandom(CreateState(seed, streamIndex));
-            for (int index = shuffledCards.Length - 1; index > 0; index--)
+            for (int index = shuffledValues.Length - 1; index > 0; index--)
             {
                 int swapIndex = random.NextInt(index + 1);
-                NumericCard temporary = shuffledCards[index];
-                shuffledCards[index] = shuffledCards[swapIndex];
-                shuffledCards[swapIndex] = temporary;
+                T temporary = shuffledValues[index];
+                shuffledValues[index] = shuffledValues[swapIndex];
+                shuffledValues[swapIndex] = temporary;
             }
 
-            return shuffledCards;
+            return shuffledValues;
         }
 
         private static uint CreateState(int seed, int streamIndex)

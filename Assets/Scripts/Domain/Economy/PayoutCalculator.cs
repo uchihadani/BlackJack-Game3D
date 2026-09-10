@@ -6,6 +6,15 @@ namespace TwentyThree.Domain.Economy
     {
         public Money Calculate(LockedBet bet, BetOutcome outcome, PayoutRules rules)
         {
+            return CalculateBreakdown(bet, outcome, rules, BasisPoints.Zero).Total;
+        }
+
+        public PayoutBreakdown CalculateBreakdown(
+            LockedBet bet,
+            BetOutcome outcome,
+            PayoutRules rules,
+            BasisPoints netGainBonus)
+        {
             if (bet == null)
             {
                 throw new ArgumentNullException(nameof(bet));
@@ -14,13 +23,16 @@ namespace TwentyThree.Domain.Economy
             switch (outcome)
             {
                 case BetOutcome.Loss:
-                    return Money.Zero;
+                    return new PayoutBreakdown(Money.Zero, Money.Zero, Money.Zero);
                 case BetOutcome.Draw:
-                    return bet.Amount;
+                case BetOutcome.ProtectedDraw:
+                    return new PayoutBreakdown(bet.Amount, Money.Zero, Money.Zero);
                 case BetOutcome.NormalWin:
                 case BetOutcome.InitialTwentyThree:
                     BasisPoints netGain = rules.GetNetGain(outcome, bet.IsAllIn);
-                    return bet.Amount + bet.Amount.ApplyPercentage(netGain);
+                    Money baseNetGain = bet.Amount.ApplyPercentage(netGain);
+                    Money bonus = baseNetGain.ApplyPercentage(netGainBonus);
+                    return new PayoutBreakdown(bet.Amount, baseNetGain, bonus);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outcome));
             }
@@ -33,16 +45,39 @@ namespace TwentyThree.Domain.Economy
             Wallet wallet,
             out Money payout)
         {
+            bool settled = TrySettle(
+                bet,
+                outcome,
+                rules,
+                BasisPoints.Zero,
+                wallet,
+                out PayoutBreakdown breakdown);
+            payout = settled ? breakdown.Total : Money.Zero;
+            return settled;
+        }
+
+        public bool TrySettle(
+            LockedBet bet,
+            BetOutcome outcome,
+            PayoutRules rules,
+            BasisPoints netGainBonus,
+            Wallet wallet,
+            out PayoutBreakdown payout)
+        {
             if (wallet == null)
             {
                 throw new ArgumentNullException(nameof(wallet));
             }
 
-            Money calculated = Calculate(bet, outcome, rules);
+            PayoutBreakdown calculated = CalculateBreakdown(
+                bet,
+                outcome,
+                rules,
+                netGainBonus);
 
-            if (!bet.TrySettle(wallet, calculated))
+            if (!bet.TrySettle(wallet, calculated.Total))
             {
-                payout = Money.Zero;
+                payout = default;
                 return false;
             }
 

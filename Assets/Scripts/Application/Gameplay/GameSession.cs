@@ -7,10 +7,12 @@ using TwentyThree.Domain.Economy;
 using TwentyThree.Domain.Gameplay;
 using TwentyThree.Domain.Progression;
 using TwentyThree.Domain.Rules;
+using TwentyThree.Domain.Psychology;
+using TwentyThree.Application.Gameplay.Content;
 
 namespace TwentyThree.Application.Gameplay
 {
-    public sealed class GameSession : IGameSession
+    public sealed partial class GameSession : IGameSession, IInternalGameSessionDiagnostics, IRunCompletionSource, ISpecialCardEffectHost, IGameEventEffectHost, IItemEffectHost
     {
         private readonly IRoundDeckFactory _roundDeckFactory;
         private readonly IHandEvaluator _handEvaluator;
@@ -192,6 +194,15 @@ namespace TwentyThree.Application.Gameplay
                     return GameCommandResult.Reject(GameCommandFailure.BetRejected);
                 }
 
+                if (_phaseThreeEnabled)
+                {
+                    ApplyPressureChange(new PressureDelta(
+                        PressureChangeCause.AllInConfirmed,
+                        Rules.PhaseThree.AllInPressure));
+                    ApplyRelationshipChange(DealerRelationshipChange.DefaultFor(
+                        DealerRelationshipChangeCause.AllInConfirmed));
+                }
+
                 return DealInitialCards();
             }
             finally
@@ -222,6 +233,11 @@ namespace TwentyThree.Application.Gameplay
 
             try
             {
+                if (_phaseThreeEnabled)
+                {
+                    return ExecuteContentHit();
+                }
+
                 SetPhase(GamePhase.DrawingPlayerCard);
                 if (!DrawCard(_playerHand, CardRecipient.Player, false))
                 {
@@ -261,6 +277,11 @@ namespace TwentyThree.Application.Gameplay
 
             try
             {
+                if (_phaseThreeEnabled)
+                {
+                    return ExecuteContentStand();
+                }
+
                 ExecuteDealerTurn();
                 return GameCommandResult.Success();
             }
@@ -272,6 +293,13 @@ namespace TwentyThree.Application.Gameplay
 
         public GameCommandResult TryPayDebt(Money amount, bool useProtectedFunds = false)
         {
+            return TryPayDebt(useProtectedFunds
+                ? new DebtPaymentAllocation(Money.Zero, amount)
+                : new DebtPaymentAllocation(amount, Money.Zero));
+        }
+
+        public GameCommandResult TryPayDebt(DebtPaymentAllocation allocation)
+        {
             GameCommandResult guard = BeginPostHandAction();
             if (!guard.Succeeded)
             {
@@ -281,10 +309,8 @@ namespace TwentyThree.Application.Gameplay
             try
             {
                 int previousCycle = _progression.CurrentCycleNumber;
-                bool paid = useProtectedFunds
-                    ? _progression.PayDebtFromProtected(_wallet, amount)
-                    : _progression.PayDebt(_wallet, amount);
-                if (!paid)
+                DebtPaymentResult payment = _progression.PayDebt(_wallet, allocation);
+                if (!payment.Succeeded)
                 {
                     return GameCommandResult.Reject(GameCommandFailure.PaymentRejected);
                 }
@@ -354,6 +380,13 @@ namespace TwentyThree.Application.Gameplay
 
             try
             {
+                if (_phaseThreeEnabled)
+                {
+                    _progression.CloseRoundDeferred();
+                    CompleteContentRoundTransition();
+                    return GameCommandResult.Success();
+                }
+
                 _progression.CloseRound();
                 CompleteRoundTransition();
                 return GameCommandResult.Success();
@@ -366,7 +399,9 @@ namespace TwentyThree.Application.Gameplay
 
         public GameCommandResult TryAbandonRound()
         {
-            GameCommandResult guard = BeginAction(GamePhase.PostHand);
+            GameCommandResult guard = _phaseThreeEnabled && Phase == GamePhase.FundingRequired
+                ? BeginAction(GamePhase.FundingRequired)
+                : BeginAction(GamePhase.PostHand);
             if (!guard.Succeeded)
             {
                 return guard;
@@ -374,6 +409,21 @@ namespace TwentyThree.Application.Gameplay
 
             try
             {
+                if (_phaseThreeEnabled)
+                {
+                    if (Phase == GamePhase.FundingRequired)
+                    {
+                        _progression.AbandonRoundFromFundingRequired();
+                    }
+                    else
+                    {
+                        _progression.AbandonRoundDeferred();
+                    }
+
+                    CompleteContentRoundTransition();
+                    return GameCommandResult.Success();
+                }
+
                 _progression.AbandonRound();
                 CompleteRoundTransition();
                 return GameCommandResult.Success();
@@ -386,6 +436,11 @@ namespace TwentyThree.Application.Gameplay
 
         private GameCommandResult DealInitialCards()
         {
+            if (_phaseThreeEnabled)
+            {
+                return BeginContentInitialDeal();
+            }
+
             if (!_deck.TryStartHand())
             {
                 throw new InvalidOperationException("The validated round deck could not start a hand.");
@@ -451,6 +506,11 @@ namespace TwentyThree.Application.Gameplay
 
         private void ResolveHand()
         {
+            if (_phaseThreeEnabled)
+            {
+                PrepareContentResolutionVisibility();
+            }
+
             SetPhase(GamePhase.Resolution);
             HandResolution resolution = _outcomeResolver.Resolve(
                 _handEvaluator.Evaluate(_playerHand),
@@ -460,6 +520,11 @@ namespace TwentyThree.Application.Gameplay
 
         private void ResolveTechnicalDraw()
         {
+            if (_phaseThreeEnabled)
+            {
+                PrepareContentResolutionVisibility();
+            }
+
             SetPhase(GamePhase.Resolution);
             HandResolution resolution = _outcomeResolver.TechnicalDraw(
                 _handEvaluator.Evaluate(_playerHand),
@@ -469,6 +534,12 @@ namespace TwentyThree.Application.Gameplay
 
         private void CompleteHand(HandResolution resolution, bool closeRound)
         {
+            if (_phaseThreeEnabled)
+            {
+                CompleteContentHand(resolution, closeRound);
+                return;
+            }
+
             BetOutcome betOutcome = ConvertOutcome(resolution.Outcome);
             if (!_payoutCalculator.TrySettle(
                     _lockedBet,
@@ -553,6 +624,12 @@ namespace TwentyThree.Application.Gameplay
             int seed = NextRoundSeed();
             _roundSeeds.Add(seed);
             _deck = _roundDeckFactory.Create(seed, Rules.MinimumCardsToStartHand);
+            if (_phaseThreeEnabled)
+            {
+                _activatedEventsThisRound.Clear();
+                _itemsBlockedForRound = false;
+                InitializeRoundRandomStreams();
+            }
         }
 
         private int NextRoundSeed()
@@ -605,7 +682,10 @@ namespace TwentyThree.Application.Gameplay
                 _progression.CurrentRoundNumber,
                 _progression.CurrentHandNumber,
                 _roundSeeds,
-                _roundHistory);
+                _roundHistory,
+                _phaseThreeEnabled
+                    ? CreatePhaseThreeRunResultSnapshot()
+                    : null);
             SetPhase(terminalPhase);
             _observerDispatcher.Publish(RunCompleted, FinalResult);
         }
@@ -662,6 +742,7 @@ namespace TwentyThree.Application.Gameplay
         {
             Phase = phase;
             _observerDispatcher.Publish(PhaseChanged, phase);
+            PublishReadModel();
         }
 
         private static BetOutcome ConvertOutcome(HandOutcome outcome)
@@ -677,6 +758,8 @@ namespace TwentyThree.Application.Gameplay
                 case HandOutcome.Draw:
                 case HandOutcome.TechnicalDraw:
                     return BetOutcome.Draw;
+                case HandOutcome.ProtectedDraw:
+                    return BetOutcome.ProtectedDraw;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(outcome), outcome, null);
             }

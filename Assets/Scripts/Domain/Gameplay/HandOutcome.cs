@@ -6,6 +6,7 @@ namespace TwentyThree.Domain.Gameplay
         Draw = 1,
         NormalWin = 2,
         InitialTwentyThree = 3,
-        TechnicalDraw = 4
+        TechnicalDraw = 4,
+        ProtectedDraw = 5
     }
 }

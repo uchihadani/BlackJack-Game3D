@@ -230,6 +230,30 @@ namespace TwentyThree.Tests.EditMode.Economy
             Assert.That(wallet.Available, Is.EqualTo(Money.FromMinorUnits(2)));
         }
 
+        [Test]
+        public void DistractedBonusAppliesTwentyPercentOnlyToRoundedBaseNetGain()
+        {
+            Wallet wallet = new Wallet(Money.FromCoins(50));
+            LockedBet bet = PlaceStandardBet(wallet, Money.FromCoins(10));
+            PayoutCalculator calculator = new PayoutCalculator();
+
+            Assert.That(
+                calculator.TrySettle(
+                    bet,
+                    BetOutcome.NormalWin,
+                    StandardPayoutRules,
+                    new BasisPoints(2000),
+                    wallet,
+                    out PayoutBreakdown payout),
+                Is.True);
+
+            Assert.That(payout.ReturnedBet, Is.EqualTo(Money.FromCoins(10)));
+            Assert.That(payout.BaseNetGain, Is.EqualTo(Money.FromMinorUnits(920)));
+            Assert.That(payout.BonusNetGain, Is.EqualTo(Money.FromMinorUnits(184)));
+            Assert.That(payout.Total, Is.EqualTo(Money.FromMinorUnits(2104)));
+            Assert.That(wallet.Available, Is.EqualTo(Money.FromMinorUnits(6104)));
+        }
+
         private static LockedBet PlaceStandardBet(Wallet wallet, Money amount)
         {
             BetPlacementService service = new BetPlacementService();

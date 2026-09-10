@@ -15,6 +15,8 @@ namespace TwentyThree.Domain.Progression
             _rules = rules ?? throw new ArgumentNullException(nameof(rules));
             CurrentCycleNumber = 1;
             CurrentRoundNumber = 1;
+            RoundOrdinal = 1;
+            RoundInstanceId = 1;
             Status = RunStatus.Active;
             _debt = new DebtAccount(_rules.GetDebtForCycle(CurrentCycleNumber));
         }
@@ -24,6 +26,16 @@ namespace TwentyThree.Domain.Progression
         public int CurrentCycleNumber { get; private set; }
 
         public int CurrentRoundNumber { get; private set; }
+
+        public int RuleRoundIndex => CurrentRoundNumber;
+
+        public int RoundOrdinal { get; private set; }
+
+        public long RoundInstanceId { get; private set; }
+
+        public bool IsExtraordinary { get; private set; }
+
+        public bool SecondChanceUsed { get; private set; }
 
         public int CompletedHandsInRound => _completedHandsInRound;
 
@@ -63,6 +75,14 @@ namespace TwentyThree.Domain.Progression
             _completedHandsInRound > 0 &&
             _completedHandsInRound < _rules.HandsPerRound;
 
+        public bool CanAbandonRoundFromFundingRequired =>
+            Status == RunStatus.Active && _completedHandsInRound == 0;
+
+        public bool CanStartExtraordinaryRound =>
+            Status == RunStatus.DebtDeadlinePending && !SecondChanceUsed;
+
+        public bool CanCommitDebtDeadline => Status == RunStatus.DebtDeadlinePending;
+
         public void RecordCompletedHand()
         {
             if (!CanStartHand)
@@ -89,39 +109,19 @@ namespace TwentyThree.Domain.Progression
 
         public bool PayDebt(Wallet wallet, Money amount)
         {
-            return PayDebt(wallet, amount, false);
+            return PayDebt(
+                wallet,
+                new DebtPaymentAllocation(amount, Money.Zero)).Succeeded;
         }
 
         public bool PayDebtFromProtected(Wallet wallet, Money amount)
         {
-            return PayDebt(wallet, amount, true);
+            return PayDebt(
+                wallet,
+                new DebtPaymentAllocation(Money.Zero, amount)).Succeeded;
         }
 
-        public Money CloseRound()
-        {
-            if (!CanCloseRound)
-            {
-                throw new InvalidOperationException("The round is not ready to close.");
-            }
-
-            Money interest = _debt.ApplyInterest(_rules.InterestPerRound);
-            CompleteRound();
-            return interest;
-        }
-
-        public Money AbandonRound()
-        {
-            if (!CanAbandonRound)
-            {
-                throw new InvalidOperationException("The round cannot be abandoned in the current run state.");
-            }
-
-            Money interest = _debt.ApplyInterest(_rules.InterestPerRound);
-            CompleteRound();
-            return interest;
-        }
-
-        private bool PayDebt(Wallet wallet, Money amount, bool useProtectedFunds)
+        public DebtPaymentResult PayDebt(Wallet wallet, DebtPaymentAllocation allocation)
         {
             if (wallet == null)
             {
@@ -130,24 +130,106 @@ namespace TwentyThree.Domain.Progression
 
             if (!CanPayDebt)
             {
-                return false;
+                return DebtPaymentResult.Failed(
+                    DebtPaymentFailure.PaymentWindowClosed,
+                    _debt.Remaining);
             }
 
-            bool paid = useProtectedFunds
-                ? _debt.TryPayFromProtected(wallet, amount)
-                : _debt.TryPayFromAvailable(wallet, amount);
+            DebtPaymentResult result = _debt.TryPay(wallet, allocation);
 
-            if (!paid)
-            {
-                return false;
-            }
-
-            if (_debt.IsPaid)
+            if (result.Succeeded && _debt.IsPaid)
             {
                 AdvanceCycleOrCompleteDemo();
             }
 
-            return true;
+            return result;
+        }
+
+        public Money CloseRound()
+        {
+            Money interest = CloseRoundDeferred();
+
+            if (Status == RunStatus.DebtDeadlinePending)
+            {
+                CommitDebtDeadlineMissed();
+            }
+
+            return interest;
+        }
+
+        public Money AbandonRound()
+        {
+            Money interest = AbandonRoundDeferred();
+
+            if (Status == RunStatus.DebtDeadlinePending)
+            {
+                CommitDebtDeadlineMissed();
+            }
+
+            return interest;
+        }
+
+        public Money CloseRoundDeferred()
+        {
+            if (!CanCloseRound)
+            {
+                throw new InvalidOperationException("The round is not ready to close.");
+            }
+
+            Money interest = _debt.ApplyInterest(_rules.InterestPerRound);
+            CompleteRoundDeferred();
+            return interest;
+        }
+
+        public Money AbandonRoundDeferred()
+        {
+            if (!CanAbandonRound)
+            {
+                throw new InvalidOperationException("The round cannot be abandoned in the current run state.");
+            }
+
+            Money interest = _debt.ApplyInterest(_rules.InterestPerRound);
+            CompleteRoundDeferred();
+            return interest;
+        }
+
+        public Money AbandonRoundFromFundingRequired()
+        {
+            if (!CanAbandonRoundFromFundingRequired)
+            {
+                throw new InvalidOperationException("Only an empty active round can be abandoned through FundingRequired.");
+            }
+
+            Money interest = _debt.ApplyInterest(_rules.InterestPerRound);
+            CompleteRoundDeferred();
+            return interest;
+        }
+
+        public void StartExtraordinaryRound()
+        {
+            if (!CanStartExtraordinaryRound)
+            {
+                throw new InvalidOperationException("An extraordinary round cannot start in the current run state.");
+            }
+
+            long nextRoundInstanceId = checked(RoundInstanceId + 1);
+            SecondChanceUsed = true;
+            IsExtraordinary = true;
+            CurrentRoundNumber = _rules.RoundsPerCycle;
+            RoundOrdinal = _rules.RoundsPerCycle + 1;
+            RoundInstanceId = nextRoundInstanceId;
+            _completedHandsInRound = 0;
+            Status = RunStatus.Active;
+        }
+
+        public void CommitDebtDeadlineMissed()
+        {
+            if (!CanCommitDebtDeadline)
+            {
+                throw new InvalidOperationException("There is no pending debt deadline to commit.");
+            }
+
+            Status = RunStatus.DebtDeadlineMissed;
         }
 
         private void AdvanceCycleOrCompleteDemo()
@@ -159,21 +241,34 @@ namespace TwentyThree.Domain.Progression
             }
 
             CurrentCycleNumber++;
-            CurrentRoundNumber = 1;
-            _completedHandsInRound = 0;
             _debt = new DebtAccount(_rules.GetDebtForCycle(CurrentCycleNumber));
-            Status = RunStatus.Active;
+            BeginOrdinaryRound(1);
         }
 
-        private void CompleteRound()
+        private void CompleteRoundDeferred()
         {
-            if (CurrentRoundNumber == _rules.RoundsPerCycle)
+            if (IsExtraordinary)
             {
                 Status = RunStatus.DebtDeadlineMissed;
                 return;
             }
 
-            CurrentRoundNumber++;
+            if (CurrentRoundNumber == _rules.RoundsPerCycle)
+            {
+                Status = RunStatus.DebtDeadlinePending;
+                return;
+            }
+
+            BeginOrdinaryRound(CurrentRoundNumber + 1);
+        }
+
+        private void BeginOrdinaryRound(int roundNumber)
+        {
+            long nextRoundInstanceId = checked(RoundInstanceId + 1);
+            CurrentRoundNumber = roundNumber;
+            RoundOrdinal = roundNumber;
+            RoundInstanceId = nextRoundInstanceId;
+            IsExtraordinary = false;
             _completedHandsInRound = 0;
             Status = RunStatus.Active;
         }

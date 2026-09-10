@@ -33,3 +33,45 @@ MonoBehaviour:
   roundsPerCycle: 4
   dealerStandThreshold: 17
   minimumCardsToStartHand: 6
+  specialRejectionCosts:
+  - 1000
+  - 2500
+  - 3000
+  - 2500
+  - 1600
+  specialPressureDeltas:
+  - 0
+  - 20
+  - 25
+  - 40
+  - 50
+  voluntaryHitPressure: 10
+  voluntaryHitAfterLossPressure: 15
+  allInPressure: 15
+  allInLossPressure: 10
+  luckyCoinProbabilityBasisPoints: 1000
+  dealRejectionPressureWhenUnfunded: 16
+  cigarettePressureRelief: 15
+  cigaretteLucidityLoss: 30
+  protectedFundsCapacityMinorUnits: 2000
+  secondChanceLucidity: 40
+  surrenderedEyeLucidityMaximum: 70
+  itemPrices:
+  - 4000
+  - 2000
+  - 4000
+  - 5000
+  - 2000
+  - 3500
+  voicesProbabilityBasisPoints: 1500
+  voicesRejectionCostMinorUnits: 2000
+  voicesTruthProbabilityBasisPoints: 7000
+  falseMessageSignalProbabilityBasisPoints: 8000
+  trueMessageSignalProbabilityBasisPoints: 2000
+  voicesPressureRelief: 15
+  meowProbabilityBasisPoints: 1200
+  meowLucidityLoss: 25
+  distractedProbabilityBasisPoints: 800
+  distractedRejectionCostMinorUnits: 3000
+  distractedLucidityLoss: 30
+  distractedNetGainBonusBasisPoints: 2000

@@ -5,15 +5,13 @@ using TwentyThree.Domain.Economy;
 using TwentyThree.Domain.Gameplay;
 using TwentyThree.Domain.Progression;
 using TwentyThree.Domain.Rules;
+using TwentyThree.Domain.Items;
+using TwentyThree.Domain.Psychology;
 
 namespace TwentyThree.Application.Gameplay
 {
     public interface IGameSession
     {
-        int RunSeed { get; }
-
-        int CurrentRoundSeed { get; }
-
         GameRules Rules { get; }
 
         GamePhase Phase { get; }
@@ -26,6 +24,14 @@ namespace TwentyThree.Application.Gameplay
 
         int CurrentHandNumber { get; }
 
+        int RuleRoundIndex { get; }
+
+        int RoundOrdinal { get; }
+
+        long RoundInstanceId { get; }
+
+        bool IsExtraordinaryRound { get; }
+
         Money AvailableMoney { get; }
 
         Money ProtectedMoney { get; }
@@ -33,6 +39,8 @@ namespace TwentyThree.Application.Gameplay
         Money RemainingDebt { get; }
 
         Money CurrentMaximumBet { get; }
+
+        Money ProtectedFundsCapacity { get; }
 
         bool CanAffordMinimumBet { get; }
 
@@ -44,33 +52,59 @@ namespace TwentyThree.Application.Gameplay
 
         bool DealerHoleCardRevealed { get; }
 
-        IReadOnlyList<NumericCard> PlayerCards { get; }
+        int Pressure { get; }
 
-        IReadOnlyList<NumericCard> DealerVisibleCards { get; }
+        PressureBand PressureBand { get; }
 
-        int DealerCardCount { get; }
+        int Lucidity { get; }
 
-        IReadOnlyList<int> RoundSeeds { get; }
+        int LucidityMaximum { get; }
 
-        IReadOnlyList<RoundHistoryEntry> CompletedRoundHistory { get; }
+        DealerRelationship DealerRelationship { get; }
 
-        int CurrentRoundDrawCount { get; }
+        IReadOnlyList<ItemInstance> TableItems { get; }
 
-        HandResolution? LastResolution { get; }
+        IReadOnlyList<ItemInstance> StoredItems { get; }
 
-        RunResultSnapshot FinalResult { get; }
+        bool ItemsBlockedForCurrentRound { get; }
+
+        bool BlackoutActive { get; }
+
+        bool DistractedActive { get; }
+
+        bool BlurredVisionActive { get; }
+
+        bool EyeSurrendered { get; }
+
+        bool LastBreathPriceDoubled { get; }
+
+        bool SecondChanceUsed { get; }
+
+        bool IsPreparationWindowOpen { get; }
+
+        PendingContentDecision PendingContentDecision { get; }
+
+        VoicesMessage? CurrentVoicesMessage { get; }
+
+        GameSessionReadModel ReadModel { get; }
 
         IReadOnlyList<Exception> ObserverFailures { get; }
 
         event Action<GamePhase> PhaseChanged;
 
-        event Action<CardDrawnEvent> CardDrawn;
+        event Action<PendingContentDecision> ContentDecisionOpened;
 
-        event Action<NumericCard> DealerHoleCardRevealedEvent;
+        event Action<VoicesMessage> VoicesMessageCreated;
 
-        event Action<HandResolution> HandResolved;
+        event Action<PressureChanged> PressureChanged;
 
-        event Action<RunResultSnapshot> RunCompleted;
+        event Action<LucidityChanged> LucidityChanged;
+
+        event Action<LucidityMaximumChanged> LucidityMaximumChanged;
+
+        event Action<DealerRelationshipChanged> DealerRelationshipChanged;
+
+        event Action<GameSessionReadModel> ReadModelChanged;
 
         GameCommandResult TryConfirmBet(Money amount);
 
@@ -83,6 +117,26 @@ namespace TwentyThree.Application.Gameplay
         GameCommandResult TryStand();
 
         GameCommandResult TryPayDebt(Money amount, bool useProtectedFunds = false);
+
+        GameCommandResult TryPayDebt(DebtPaymentAllocation allocation);
+
+        GameCommandResult TryResolveContentDecision(ContentDecisionOption option);
+
+        GameCommandResult TryUseItem(ItemId itemId);
+
+        GameCommandResult TryPurchaseItem(ItemId itemId, InventoryLocation destination);
+
+        GameCommandResult TryMoveItem(ItemId itemId, InventoryLocation destination);
+
+        GameCommandResult TrySwapItems(ItemId movingItemId, ItemId destinationItemId);
+
+        GameCommandResult TryDiscardItem(ItemId itemId);
+
+        GameCommandResult TryDepositProtected(Money amount);
+
+        GameCommandResult TryWithdrawProtected(Money amount);
+
+        GameCommandResult TryExpireTimedCardDistortion(CardId cardId);
 
         GameCommandResult TryContinue();
 

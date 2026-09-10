@@ -18,8 +18,8 @@ namespace TwentyThree.Domain.Cards
 
             foreach (NumericCard card in hand.Cards)
             {
-                total += card.Value;
-                if (card.IsAce)
+                total += hand.GetMechanicalValue(card);
+                if (hand.IsFlexibleAce(card))
                 {
                     softAceCount++;
                 }
@@ -31,7 +31,17 @@ namespace TwentyThree.Domain.Cards
                 softAceCount--;
             }
 
-            return new HandScore(total, hand.Count, softAceCount);
+            int adjustedTotal = checked(total + hand.TotalModifier);
+            if (adjustedTotal < 0)
+            {
+                throw new InvalidOperationException("A hand total modifier produced a negative total.");
+            }
+
+            return new HandScore(
+                adjustedTotal,
+                hand.Count,
+                softAceCount,
+                hand.TotalModifier != 0);
         }
     }
 }

@@ -11,6 +11,7 @@ namespace TwentyThree.Application.Gameplay
         private readonly List<RunResultSnapshot> _completedRuns;
         private readonly ReadOnlyCollection<RunResultSnapshot> _readOnlyCompletedRuns;
         private readonly ObserverDispatcher _observerDispatcher;
+        private IRunCompletionSource _completionSource;
 
         public RunSessionController(
             IGameSessionFactory factory,
@@ -37,11 +38,14 @@ namespace TwentyThree.Application.Gameplay
         {
             if (Current != null)
             {
-                Current.RunCompleted -= HandleRunCompleted;
+                _completionSource.RunCompleted -= HandleRunCompleted;
             }
 
             Current = _factory.Create(_seedProvider.NextSeed());
-            Current.RunCompleted += HandleRunCompleted;
+            _completionSource = Current as IRunCompletionSource ??
+                throw new InvalidOperationException(
+                    "The game session does not publish run completion.");
+            _completionSource.RunCompleted += HandleRunCompleted;
             _observerDispatcher.Publish(SessionChanged, Current);
             return Current;
         }

@@ -5,6 +5,7 @@ namespace TwentyThree.Domain.Economy
         Loss,
         Draw,
         NormalWin,
-        InitialTwentyThree
+        InitialTwentyThree,
+        ProtectedDraw
     }
 }

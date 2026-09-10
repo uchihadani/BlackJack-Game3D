@@ -4,7 +4,11 @@ namespace TwentyThree.Domain.Cards
 {
     public readonly struct HandScore : IEquatable<HandScore>
     {
-        public HandScore(int total, int cardCount, int softAceCount)
+        public HandScore(
+            int total,
+            int cardCount,
+            int softAceCount,
+            bool usesHandTotalCorrection = false)
         {
             if (total < 0)
             {
@@ -24,6 +28,7 @@ namespace TwentyThree.Domain.Cards
             Total = total;
             CardCount = cardCount;
             SoftAceCount = softAceCount;
+            UsesHandTotalCorrection = usesHandTotalCorrection;
         }
 
         public int Total { get; }
@@ -32,17 +37,21 @@ namespace TwentyThree.Domain.Cards
 
         public int SoftAceCount { get; }
 
+        public bool UsesHandTotalCorrection { get; }
+
         public bool IsBust => Total > TwentyThreeHandEvaluator.TargetTotal;
 
         public bool IsTwentyThree => Total == TwentyThreeHandEvaluator.TargetTotal;
 
-        public bool IsInitialTwentyThree => IsTwentyThree && CardCount == 3;
+        public bool IsInitialTwentyThree =>
+            IsTwentyThree && CardCount == 3 && !UsesHandTotalCorrection;
 
         public bool Equals(HandScore other)
         {
             return Total == other.Total &&
                    CardCount == other.CardCount &&
-                   SoftAceCount == other.SoftAceCount;
+                   SoftAceCount == other.SoftAceCount &&
+                   UsesHandTotalCorrection == other.UsesHandTotalCorrection;
         }
 
         public override bool Equals(object obj)
@@ -52,7 +61,11 @@ namespace TwentyThree.Domain.Cards
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Total, CardCount, SoftAceCount);
+            return HashCode.Combine(
+                Total,
+                CardCount,
+                SoftAceCount,
+                UsesHandTotalCorrection);
         }
     }
 }

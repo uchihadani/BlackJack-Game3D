@@ -30,6 +30,80 @@ namespace TwentyThree.Tests.EditMode.Economy
         }
 
         [Test]
+        public void CombinedPaymentAtomicallyUsesBothBalances()
+        {
+            Wallet wallet = new Wallet(Money.FromCoins(50), Money.FromCoins(20));
+            DebtAccount debt = new DebtAccount(Money.FromCoins(200));
+
+            DebtPaymentResult result = debt.TryPay(
+                wallet,
+                new DebtPaymentAllocation(Money.FromCoins(30), Money.FromCoins(15)));
+
+            Assert.That(result.Succeeded, Is.True);
+            Assert.That(result.Paid, Is.EqualTo(Money.FromCoins(45)));
+            Assert.That(result.RemainingDebt, Is.EqualTo(Money.FromCoins(155)));
+            Assert.That(wallet.Available, Is.EqualTo(Money.FromCoins(20)));
+            Assert.That(wallet.Protected, Is.EqualTo(Money.FromCoins(5)));
+            Assert.That(debt.Remaining, Is.EqualTo(Money.FromCoins(155)));
+        }
+
+        [Test]
+        public void InvalidCombinedPaymentDoesNotPartiallyDebitAnyBalance()
+        {
+            Wallet wallet = new Wallet(Money.FromCoins(50), Money.FromCoins(20));
+            DebtAccount debt = new DebtAccount(Money.FromCoins(200));
+
+            DebtPaymentResult result = debt.TryPay(
+                wallet,
+                new DebtPaymentAllocation(Money.FromCoins(30), Money.FromCoins(21)));
+
+            Assert.That(result.Failure, Is.EqualTo(DebtPaymentFailure.InsufficientProtectedFunds));
+            Assert.That(wallet.Available, Is.EqualTo(Money.FromCoins(50)));
+            Assert.That(wallet.Protected, Is.EqualTo(Money.FromCoins(20)));
+            Assert.That(debt.Remaining, Is.EqualTo(Money.FromCoins(200)));
+        }
+
+        [Test]
+        public void CombinedPaymentCannotExceedRemainingDebt()
+        {
+            Wallet wallet = new Wallet(Money.FromCoins(150), Money.FromCoins(100));
+            DebtAccount debt = new DebtAccount(Money.FromCoins(200));
+
+            DebtPaymentResult result = debt.TryPay(
+                wallet,
+                new DebtPaymentAllocation(Money.FromCoins(150), Money.FromCoins(51)));
+
+            Assert.That(result.Failure, Is.EqualTo(DebtPaymentFailure.ExceedsRemainingDebt));
+            Assert.That(wallet.Available, Is.EqualTo(Money.FromCoins(150)));
+            Assert.That(wallet.Protected, Is.EqualTo(Money.FromCoins(100)));
+            Assert.That(debt.Remaining, Is.EqualTo(Money.FromCoins(200)));
+        }
+
+        [Test]
+        public void CombinedPaymentRequiresAPositiveNonOverflowingTotal()
+        {
+            Wallet wallet = new Wallet(
+                Money.FromMinorUnits(long.MaxValue),
+                Money.FromMinorUnits(long.MaxValue));
+            DebtAccount debt = new DebtAccount(Money.FromMinorUnits(long.MaxValue));
+
+            DebtPaymentResult zero = debt.TryPay(
+                wallet,
+                new DebtPaymentAllocation(Money.Zero, Money.Zero));
+            DebtPaymentResult overflow = debt.TryPay(
+                wallet,
+                new DebtPaymentAllocation(
+                    Money.FromMinorUnits(long.MaxValue),
+                    Money.FromMinorUnits(1)));
+
+            Assert.That(zero.Failure, Is.EqualTo(DebtPaymentFailure.AmountMustBePositive));
+            Assert.That(overflow.Failure, Is.EqualTo(DebtPaymentFailure.AmountOverflow));
+            Assert.That(wallet.Available, Is.EqualTo(Money.FromMinorUnits(long.MaxValue)));
+            Assert.That(wallet.Protected, Is.EqualTo(Money.FromMinorUnits(long.MaxValue)));
+            Assert.That(debt.Remaining, Is.EqualTo(Money.FromMinorUnits(long.MaxValue)));
+        }
+
+        [Test]
         public void InvalidPaymentDoesNotMutateWalletOrDebt()
         {
             Wallet wallet = new Wallet(Money.FromCoins(50));

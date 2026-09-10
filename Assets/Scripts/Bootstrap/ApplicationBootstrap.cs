@@ -58,7 +58,8 @@ namespace TwentyThree.Bootstrap
             {
                 GameSessionFactory sessionFactory = new GameSessionFactory(
                     gameRulesConfiguration.CreateRules(),
-                    new DeterministicCardShuffler());
+                    new DeterministicCardShuffler(),
+                    new DeterministicRandomStreamFactory());
                 _runSessionController = new RunSessionController(
                     sessionFactory,
                     new SystemRunSeedProvider());

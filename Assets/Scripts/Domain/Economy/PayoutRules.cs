@@ -30,6 +30,7 @@ namespace TwentyThree.Domain.Economy
             {
                 case BetOutcome.Loss:
                 case BetOutcome.Draw:
+                case BetOutcome.ProtectedDraw:
                     return BasisPoints.Zero;
                 case BetOutcome.NormalWin:
                     return isAllIn ? AllInWin : NormalWin;

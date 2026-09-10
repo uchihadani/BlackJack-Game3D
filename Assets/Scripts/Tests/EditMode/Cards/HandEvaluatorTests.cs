@@ -48,6 +48,44 @@ namespace TwentyThree.Tests.EditMode.Cards
             Assert.That(score.IsBust, Is.False);
         }
 
+        [Test]
+        public void MechanicalOverrideMakesAnAceFixed()
+        {
+            NumericCard ace = new NumericCard(CardSuit.Hearts, CardRank.Ace);
+            Hand hand = new Hand(new[]
+            {
+                ace,
+                new NumericCard(CardSuit.Clubs, CardRank.Ten),
+                new NumericCard(CardSuit.Spades, CardRank.Ten)
+            });
+
+            Assert.That(hand.TrySetValueOverride(ace.Id, 5), Is.True);
+            HandScore score = _evaluator.Evaluate(hand);
+
+            Assert.That(score.Total, Is.EqualTo(25));
+            Assert.That(score.SoftAceCount, Is.Zero);
+            Assert.That(score.IsBust, Is.True);
+        }
+
+        [Test]
+        public void TotalCorrectionDoesNotReceiveInitialTwentyThreeClassification()
+        {
+            Hand hand = new Hand(new[]
+            {
+                new NumericCard(CardSuit.Hearts, CardRank.Ten),
+                new NumericCard(CardSuit.Clubs, CardRank.Nine),
+                new NumericCard(CardSuit.Spades, CardRank.Five)
+            });
+            hand.SetTotalModifier(-1);
+
+            HandScore score = _evaluator.Evaluate(hand);
+
+            Assert.That(score.Total, Is.EqualTo(23));
+            Assert.That(score.IsTwentyThree, Is.True);
+            Assert.That(score.UsesHandTotalCorrection, Is.True);
+            Assert.That(score.IsInitialTwentyThree, Is.False);
+        }
+
         private static Hand CreateHand(
             CardRank first,
             CardRank second,

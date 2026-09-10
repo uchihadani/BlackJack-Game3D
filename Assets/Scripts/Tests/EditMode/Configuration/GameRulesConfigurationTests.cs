@@ -1,6 +1,9 @@
 using System;
 using NUnit.Framework;
 using TwentyThree.Domain.Economy;
+using TwentyThree.Domain.Events;
+using TwentyThree.Domain.Items;
+using TwentyThree.Domain.SpecialCards;
 using TwentyThree.Editor;
 using TwentyThree.Infrastructure.Configuration;
 using UnityEditor;
@@ -39,6 +42,29 @@ namespace TwentyThree.Tests.EditMode.Configuration
             Assert.That(rules.GetDebtForCycle(1), Is.EqualTo(Money.FromCoins(200)));
             Assert.That(rules.GetDebtForCycle(4), Is.EqualTo(Money.FromCoins(1600)));
             Assert.That(rules.GetMaximumBetForRound(4), Is.EqualTo(Money.FromCoins(35)));
+            Assert.That(rules.PhaseThree.IsEnabled, Is.True);
+            Assert.That(rules.PhaseThree.SpecialCards.Definitions.Count, Is.EqualTo(5));
+            Assert.That(
+                rules.PhaseThree.SpecialCards.Get(SpecialCardId.WeHaveADeal).RejectionCost,
+                Is.EqualTo(Money.FromCoins(16)));
+            Assert.That(
+                rules.PhaseThree.SpecialCards.Get(SpecialCardId.ThirdEye).AppliedPressureDelta,
+                Is.EqualTo(40));
+            Assert.That(rules.PhaseThree.Events.Definitions.Count, Is.EqualTo(3));
+            Assert.That(
+                rules.PhaseThree.Events.Get(GameEventId.VoicesFromBeyond).BaseProbability,
+                Is.EqualTo(new BasisPoints(1500)));
+            Assert.That(
+                rules.PhaseThree.Events.DistractedNetGainBonus,
+                Is.EqualTo(new BasisPoints(2000)));
+            Assert.That(rules.PhaseThree.Items.Definitions.Count, Is.EqualTo(5));
+            Assert.That(
+                rules.PhaseThree.Items.TryGetDefinition(ItemId.IT05, out ItemDefinition luckyCoin),
+                Is.True);
+            Assert.That(luckyCoin.BasePurchasePrice, Is.EqualTo(Money.FromCoins(35)));
+            Assert.That(rules.PhaseThree.VoluntaryHitPressure, Is.EqualTo(10));
+            Assert.That(rules.PhaseThree.VoluntaryHitAfterLossPressure, Is.EqualTo(15));
+            Assert.That(rules.PhaseThree.ProtectedFundsCapacity, Is.EqualTo(Money.FromCoins(20)));
         }
 
         [Test]

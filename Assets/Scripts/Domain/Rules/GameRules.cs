@@ -21,7 +21,8 @@ namespace TwentyThree.Domain.Rules
             int handsPerRound,
             int roundsPerCycle,
             int dealerStandThreshold,
-            int minimumCardsToStartHand)
+            int minimumCardsToStartHand,
+            PhaseThreeRules phaseThree = null)
         {
             RequirePositive(initialMoney, nameof(initialMoney));
             RequirePositive(minimumBet, nameof(minimumBet));
@@ -85,6 +86,7 @@ namespace TwentyThree.Domain.Rules
             RoundsPerCycle = roundsPerCycle;
             DealerStandThreshold = dealerStandThreshold;
             MinimumCardsToStartHand = minimumCardsToStartHand;
+            PhaseThree = phaseThree ?? PhaseThreeRules.CreateDefault();
             _debtsByCycle = Array.AsReadOnly(debtCopy);
             _maximumBetsByRound = Array.AsReadOnly(maximumBetCopy);
         }
@@ -108,6 +110,8 @@ namespace TwentyThree.Domain.Rules
         public int DealerStandThreshold { get; }
 
         public int MinimumCardsToStartHand { get; }
+
+        public PhaseThreeRules PhaseThree { get; }
 
         public int CycleCount => _debtsByCycle.Count;
 

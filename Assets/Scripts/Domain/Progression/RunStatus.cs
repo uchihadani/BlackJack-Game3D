@@ -5,6 +5,7 @@ namespace TwentyThree.Domain.Progression
         Active = 0,
         RoundClosurePending = 1,
         DemoCompleted = 2,
-        DebtDeadlineMissed = 3
+        DebtDeadlineMissed = 3,
+        DebtDeadlinePending = 4
     }
 }
